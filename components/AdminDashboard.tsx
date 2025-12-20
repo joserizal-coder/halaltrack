@@ -12,7 +12,7 @@ interface AdminDashboardProps {
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ users, onAddUser, onDeleteUser }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState<'superadmin' | 'admin'>('admin');
+  const [role, setRole] = useState<'superadmin' | 'admin' | 'user'>('user');
   const [successMsg, setSuccessMsg] = useState('');
 
   const [loading, setLoading] = useState(false);
@@ -81,6 +81,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ users, onAddUser, onDel
                 onChange={(e) => setRole(e.target.value as any)}
                 className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               >
+                <option value="user">User</option>
                 <option value="admin">Admin</option>
                 <option value="superadmin">Superadmin</option>
               </select>

@@ -23,6 +23,7 @@ export const STAGES: StageConfig[] = [
   { id: TaskStage.PRICING, label: 'Penetapan Harga', color: 'bg-amber-100 text-amber-700 border-amber-200', icon: 'dollar-sign' },
   { id: TaskStage.PRE_AUDIT, label: 'Pra audit', color: 'bg-indigo-100 text-indigo-700 border-indigo-200', icon: 'clipboard-check' },
   { id: TaskStage.AUDIT, label: 'Audit', color: 'bg-purple-100 text-purple-700 border-purple-200', icon: 'search' },
+  { id: TaskStage.REVIEW_INTERNAL, label: 'Review Internal', color: 'bg-pink-100 text-pink-700 border-pink-200', icon: 'eye' },
   { id: TaskStage.REVIEW, label: 'Review', color: 'bg-orange-100 text-orange-700 border-orange-200', icon: 'eye' },
   { id: TaskStage.FATWA_SESSION, label: 'Sidang Komisi Fatwa', color: 'bg-emerald-100 text-emerald-700 border-emerald-200', icon: 'users' },
   { id: TaskStage.CERTIFIED, label: 'Sertifikat Terbit', color: 'bg-green-100 text-green-700 border-green-200', icon: 'award' }
@@ -35,6 +36,7 @@ export const STAGE_SLA: Record<TaskStage, number> = {
   [TaskStage.PRICING]: 2,
   [TaskStage.PRE_AUDIT]: 3,
   [TaskStage.AUDIT]: 7,
+  [TaskStage.REVIEW_INTERNAL]: 2,
   [TaskStage.REVIEW]: 3,
   [TaskStage.FATWA_SESSION]: 2,
   [TaskStage.CERTIFIED]: 1,
@@ -47,6 +49,7 @@ export const DEFAULT_CHECKLISTS: Record<TaskStage, string[]> = {
   [TaskStage.PRICING]: ['Invoice Terbit', 'Konfirmasi Pembayaran'],
   [TaskStage.PRE_AUDIT]: ['Review Dokumen Bahan', 'Matriks Produk', 'Manual SJPH'],
   [TaskStage.AUDIT]: ['Laporan Audit Lapangan', 'Foto Fasilitas Prod', 'Checklist Temuan'],
+  [TaskStage.REVIEW_INTERNAL]: ['Review Laporan Audit', 'Verifikasi Dokumen Internal'],
   [TaskStage.REVIEW]: ['Verifikasi Hasil Audit', 'Draft Ketetapan Halal'],
   [TaskStage.FATWA_SESSION]: ['Hasil Sidang Fatwa', 'Berita Acara'],
   [TaskStage.CERTIFIED]: ['E-Sertifikat', 'Copy Sertifikat Fisik'],

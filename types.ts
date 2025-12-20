@@ -5,6 +5,7 @@ export enum TaskStage {
   PRICING = 'Penetapan Harga',
   PRE_AUDIT = 'Pra audit',
   AUDIT = 'Audit',
+  REVIEW_INTERNAL = 'Review Internal',
   REVIEW = 'Review',
   FATWA_SESSION = 'Sidang Komisi Fatwa',
   CERTIFIED = 'Sertifikat Terbit'
@@ -44,6 +45,6 @@ export interface UserAccount {
   id: string;
   username: string;
   password?: string;
-  role: 'superadmin' | 'admin';
+  role: 'superadmin' | 'admin' | 'user';
   createdAt: string;
 }
