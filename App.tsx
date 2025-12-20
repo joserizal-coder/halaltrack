@@ -250,16 +250,20 @@ const App: React.FC = () => {
       }
 
       // Delete from profiles table (should cascade automatically, but we do it explicitly)
-      const { error: profileError } = await supabase.from('profiles').delete().eq('id', userId);
+
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', userId);
 
       if (profileError) {
-        console.error('Error deleting profile:', profileError);
-        alert(`User dihapus dari Auth, tapi gagal menghapus profile: ${profileError.message}`);
+        alert(`Gagal menghapus user: ${profileError.message}`);
+        return;
       }
 
       // Update UI
       setUsers(prev => prev.filter(u => u.id !== userId));
-      alert('User berhasil dihapus!');
+      alert('User berhasil dihapus dari sistem!');
     } catch (err) {
       console.error('Unexpected error during user deletion:', err);
       alert('Terjadi kesalahan tidak terduga saat menghapus user.');
