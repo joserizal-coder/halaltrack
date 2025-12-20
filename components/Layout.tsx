@@ -155,7 +155,7 @@ const Layout: React.FC<LayoutProps> = ({
             </div>
             <h1 className="text-base font-black text-slate-900 tracking-tight">HALAL<span className="text-emerald-600">TRACK</span></h1>
           </div>
-          <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 text-slate-400 hover:text-slate-900">
+          <button onClick={() => setIsMobileMenuOpen(false)} className="p-3 bg-slate-50 text-slate-400 hover:text-slate-900 rounded-2xl transition-all">
             <X size={20} />
           </button>
         </div>
@@ -236,7 +236,7 @@ const Layout: React.FC<LayoutProps> = ({
                 type="text"
                 onChange={(e) => onSearch?.(e.target.value)}
                 placeholder="Cari..."
-                className="w-full pl-11 md:pl-14 pr-4 md:pr-6 py-2.5 md:py-4 bg-white/50 border border-slate-200/60 rounded-xl md:rounded-2xl text-sm md:text-[15px] font-semibold focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500/50 focus:bg-white transition-all shadow-sm"
+                className="w-full pl-11 md:pl-14 pr-4 md:pr-6 py-2.5 md:py-4 bg-white/50 border border-slate-200/60 rounded-xl md:rounded-2xl text-[13px] md:text-[15px] font-semibold focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500/50 focus:bg-white transition-all shadow-sm"
               />
             </div>
           </div>
@@ -273,10 +273,51 @@ const Layout: React.FC<LayoutProps> = ({
           </div>
         </header>
 
-        <div className="px-4 md:px-12 py-8 md:py-12">
+        <div className="px-4 md:px-12 py-6 md:py-12 pb-32 md:pb-12">
           {children}
         </div>
       </main>
+
+      {/* Bottom Navigation for Mobile */}
+      <nav className="fixed bottom-0 left-0 right-0 h-20 bg-white/80 backdrop-blur-2xl border-t border-slate-200/60 z-[45] md:hidden flex items-center justify-around px-2 shadow-[0_-8px_32px_-12px_rgba(0,0,0,0.1)]">
+        <button
+          onClick={() => onNavigate?.('dashboard')}
+          className={`flex flex-col items-center gap-1.5 p-2 transition-all ${activeView === 'dashboard' ? 'text-emerald-600' : 'text-slate-400'}`}
+        >
+          <LayoutDashboard size={20} className={activeView === 'dashboard' ? 'scale-110' : ''} />
+          <span className="text-[10px] font-black uppercase tracking-tighter">Beranda</span>
+        </button>
+        <button
+          onClick={() => onNavigate?.('tasks')}
+          className={`flex flex-col items-center gap-1.5 p-2 transition-all ${activeView === 'tasks' ? 'text-emerald-600' : 'text-slate-400'}`}
+        >
+          <ListTodo size={20} className={activeView === 'tasks' ? 'scale-110' : ''} />
+          <span className="text-[10px] font-black uppercase tracking-tighter">Tugas</span>
+        </button>
+        <div className="relative -mt-10">
+          <button
+            onClick={onAddNew}
+            className="w-14 h-14 premium-gradient-green rounded-2xl flex items-center justify-center text-white shadow-xl shadow-emerald-200 border-4 border-white active:scale-90 transition-transform"
+          >
+            <Plus size={24} strokeWidth={3} />
+          </button>
+        </div>
+        <button
+          onClick={onToggleNotifications}
+          className={`flex flex-col items-center gap-1.5 p-2 transition-all relative ${overdueCount > 0 ? 'text-rose-500' : 'text-slate-400'}`}
+        >
+          <Bell size={20} />
+          {overdueCount > 0 && <span className="absolute top-1 right-2 w-2 h-2 bg-rose-500 rounded-full border border-white"></span>}
+          <span className="text-[10px] font-black uppercase tracking-tighter">Notif</span>
+        </button>
+        <button
+          onClick={() => onNavigate?.('settings')}
+          className={`flex flex-col items-center gap-1.5 p-2 transition-all ${activeView === 'settings' ? 'text-slate-900' : 'text-slate-400'}`}
+        >
+          <Settings size={20} className={activeView === 'settings' ? 'scale-110' : ''} />
+          <span className="text-[10px] font-black uppercase tracking-tighter">Setel</span>
+        </button>
+      </nav>
     </div>
   );
 };
