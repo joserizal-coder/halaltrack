@@ -113,25 +113,25 @@ const SettingsDashboard: React.FC<SettingsDashboardProps> = ({ slaSettings, onSa
             </div>
           </div>
 
-          <div className="bg-slate-900 p-6 rounded-3xl text-white shadow-xl">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center text-white">
-                <Database size={20} />
+          {isAdmin && (
+            <div className="bg-slate-900 p-6 rounded-3xl text-white shadow-xl">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center text-white">
+                  <Database size={20} />
+                </div>
+                <h3 className="font-bold">Pemeliharaan Data</h3>
               </div>
-              <h3 className="font-bold">Pemeliharaan Data</h3>
-            </div>
-            <p className="text-xs text-slate-400 leading-relaxed mb-6">
-              Gunakan fungsi ini untuk membersihkan cache atau mereset aplikasi ke pengaturan pabrik.
-            </p>
-            <div className="space-y-3">
-              <button
-                onClick={() => window.location.reload()}
-                className="w-full py-3 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all"
-              >
-                <RefreshCw size={14} />
-                Segarkan Cache
-              </button>
-              {isAdmin && (
+              <p className="text-xs text-slate-400 leading-relaxed mb-6">
+                Gunakan fungsi ini untuk membersihkan cache atau mereset aplikasi ke pengaturan pabrik.
+              </p>
+              <div className="space-y-3">
+                <button
+                  onClick={() => window.location.reload()}
+                  className="w-full py-3 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all"
+                >
+                  <RefreshCw size={14} />
+                  Segarkan Cache
+                </button>
                 <button
                   onClick={() => {
                     if (confirm("Hapus SEMUA data task dan user? Tindakan ini tidak dapat dibatalkan.")) {
@@ -143,9 +143,9 @@ const SettingsDashboard: React.FC<SettingsDashboardProps> = ({ slaSettings, onSa
                 >
                   Reset Factory Data
                 </button>
-              )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
       </div>
