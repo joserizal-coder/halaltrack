@@ -33,7 +33,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, canEdit, onClose, onUpdateS
   const updatedAt = new Date(task.stageUpdatedAt).getTime();
   const daysInStage = Math.floor((Date.now() - updatedAt) / (1000 * 60 * 60 * 24));
   const slaLimit = STAGE_SLA[task.stage];
-  const isOverdue = daysInStage >= slaLimit && task.status !== 'On Hold';
+  const isOverdue = slaLimit > 0 && daysInStage >= slaLimit && task.status !== 'On Hold';
   const isOnHold = task.status === 'On Hold';
 
   const handleRunAi = async () => {
