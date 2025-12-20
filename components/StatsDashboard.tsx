@@ -25,7 +25,7 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({ tasks }) => {
       <div className="lg:col-span-8 glass-panel p-8 md:p-10 rounded-[3rem] border-white/60 shadow-xl">
         <div className="flex items-center justify-between mb-10">
           <div>
-            <h3 className="text-2xl font-black text-slate-900 tracking-tight">Pergerakan Sertifikasi</h3>
+            <h3 className="text-2xl font-black text-slate-900 tracking-tight">Progress Sertifikasi</h3>
             <p className="text-slate-400 text-sm font-bold uppercase tracking-widest mt-1">Distribusi Real-time Pengajuan</p>
           </div>
           <div className="flex gap-2">
@@ -68,7 +68,19 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({ tasks }) => {
                   fontWeight: '800'
                 }}
               />
-              <Bar dataKey="count" fill="url(#barGradient)" radius={[12, 12, 12, 12]} barSize={32} />
+              <Bar dataKey="count" radius={[12, 12, 12, 12]} barSize={32}>
+                {data.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={[
+                    '#10b981', // Emerald (Submitted)
+                    '#6366f1', // Indigo (Penetapan Harga)
+                    '#8b5cf6', // Violet (Pra audit)
+                    '#f59e0b', // Amber (Audit)
+                    '#f43f5e', // Rose (Review)
+                    '#ec4899', // Pink (Sidang)
+                    '#06b6d4'  // Cyan (Sertifikat)
+                  ][index % 7]} />
+                ))}
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
