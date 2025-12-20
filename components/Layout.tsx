@@ -30,7 +30,13 @@ const Layout: React.FC<LayoutProps> = ({
   onLogout
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
-  const isAdmin = currentUser?.role === 'superadmin' || currentUser?.role === 'admin';
+
+  // Debug log
+  React.useEffect(() => {
+    console.log('Layout - Current User:', currentUser);
+  }, [currentUser]);
+
+  const isAdmin = currentUser?.role?.toLowerCase() === 'superadmin' || currentUser?.role?.toLowerCase() === 'admin';
   const isLoggedIn = !!currentUser;
 
   return (
@@ -115,7 +121,8 @@ const Layout: React.FC<LayoutProps> = ({
                 </div>
                 <div className="overflow-hidden">
                   <p className="text-[15px] font-black text-slate-900 truncate">{currentUser.username}</p>
-                  <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">{currentUser.role}</p>
+                  <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">{currentUser.role || 'no-role'}</p>
+                  {!isAdmin && <p className="text-[8px] text-rose-400 font-bold uppercase mt-1">Non-Admin Access</p>}
                 </div>
               </div>
               <button
