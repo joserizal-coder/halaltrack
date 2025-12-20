@@ -294,14 +294,16 @@ const Layout: React.FC<LayoutProps> = ({
           <ListTodo size={20} className={activeView === 'tasks' ? 'scale-110' : ''} />
           <span className="text-[10px] font-black uppercase tracking-tighter">Tugas</span>
         </button>
-        <div className="relative -mt-10">
-          <button
-            onClick={onAddNew}
-            className="w-14 h-14 premium-gradient-green rounded-2xl flex items-center justify-center text-white shadow-xl shadow-emerald-200 border-4 border-white active:scale-90 transition-transform"
-          >
-            <Plus size={24} strokeWidth={3} />
-          </button>
-        </div>
+        {isLoggedIn && (
+          <div className="relative -mt-10">
+            <button
+              onClick={onAddNew}
+              className="w-14 h-14 premium-gradient-green rounded-2xl flex items-center justify-center text-white shadow-xl shadow-emerald-200 border-4 border-white active:scale-90 transition-transform"
+            >
+              <Plus size={24} strokeWidth={3} />
+            </button>
+          </div>
+        )}
         <button
           onClick={onToggleNotifications}
           className={`flex flex-col items-center gap-1.5 p-2 transition-all relative ${overdueCount > 0 ? 'text-rose-500' : 'text-slate-400'}`}
