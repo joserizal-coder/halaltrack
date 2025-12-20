@@ -239,6 +239,23 @@ const Layout: React.FC<LayoutProps> = ({
             </button>
           )}
         </div>
+
+        {/* Copyright */}
+        <div className="px-6 pb-6 mt-auto">
+          <div className="text-center pt-4 border-t border-slate-100">
+            <p className="text-[9px] text-slate-400 font-medium leading-relaxed">
+              © 2026 LPH UNISMA
+            </p>
+            <a
+              href="https://www.lph.unisma.ac.id"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[9px] text-emerald-600 hover:text-emerald-700 font-semibold transition-colors"
+            >
+              www.lph.unisma.ac.id
+            </a>
+          </div>
+        </div>
       </aside>
 
       {/* Main Content */}
