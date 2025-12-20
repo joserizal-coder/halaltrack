@@ -6,11 +6,24 @@ import { TaskStage } from '../types';
 
 interface SettingsDashboardProps {
   slaSettings: Record<TaskStage, number>;
-  onUpdateSla: (stage: TaskStage, days: number) => void;
+  onSaveSla: (settings: Record<TaskStage, number>) => void;
   isAdmin: boolean;
 }
 
-const SettingsDashboard: React.FC<SettingsDashboardProps> = ({ slaSettings, onUpdateSla, isAdmin }) => {
+const SettingsDashboard: React.FC<SettingsDashboardProps> = ({ slaSettings, onSaveSla, isAdmin }) => {
+  const [localSettings, setLocalSettings] = React.useState(slaSettings);
+  const [hasChanges, setHasChanges] = React.useState(false);
+
+  React.useEffect(() => {
+    setLocalSettings(slaSettings);
+  }, [slaSettings]);
+
+  const handleChange = (stage: TaskStage, value: string) => {
+    const numValue = parseInt(value) || 0;
+    setLocalSettings(prev => ({ ...prev, [stage]: numValue }));
+    setHasChanges(true);
+  };
+
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -28,9 +41,21 @@ const SettingsDashboard: React.FC<SettingsDashboardProps> = ({ slaSettings, onUp
                   <p className="text-xs text-slate-500 font-medium">Batas waktu maksimal pengerjaan per tahapan</p>
                 </div>
               </div>
-              {!isAdmin && (
-                <span className="text-[10px] font-black text-amber-600 bg-amber-50 px-2 py-1 rounded-full uppercase">Read Only</span>
-              )}
+              <div className="flex items-center gap-2">
+                {!isAdmin && (
+                  <span className="text-[10px] font-black text-amber-600 bg-amber-50 px-2 py-1 rounded-full uppercase">Read Only</span>
+                )}
+                {isAdmin && (
+                  <button
+                    onClick={() => onSaveSla(localSettings)}
+                    disabled={!hasChanges}
+                    className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white rounded-xl text-xs font-bold transition-all shadow-sm"
+                  >
+                    <Save size={14} />
+                    Simpan Perubahan
+                  </button>
+                )}
+              </div>
             </div>
 
             <div className="p-6">
@@ -46,8 +71,8 @@ const SettingsDashboard: React.FC<SettingsDashboardProps> = ({ slaSettings, onUp
                         type="number"
                         min="1"
                         disabled={!isAdmin}
-                        value={slaSettings[stage.id] || 0}
-                        onChange={(e) => onUpdateSla(stage.id, parseInt(e.target.value) || 1)}
+                        value={localSettings[stage.id] || 0}
+                        onChange={(e) => handleChange(stage.id, e.target.value)}
                         className="w-16 px-2 py-2 bg-white border border-slate-200 rounded-xl text-center font-bold text-slate-800 focus:ring-2 focus:ring-emerald-500/20 outline-none disabled:bg-slate-100 disabled:text-slate-400 transition-all"
                       />
                       <span className="text-xs font-bold text-slate-400">Hari</span>

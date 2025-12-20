@@ -230,10 +230,10 @@ const App: React.FC = () => {
     }));
   };
 
-  const handleUpdateSla = async (stage: TaskStage, days: number) => {
-    const newSettings = { ...slaSettings, [stage]: days };
+  const handleSaveSla = async (newSettings: Record<TaskStage, number>) => {
     setSlaSettings(newSettings);
     await supabase.from('settings').update({ value: newSettings }).eq('key', 'sla_config');
+    alert('Pengaturan SLA berhasil disimpan!');
   };
 
   const handleDeleteUser = async (userId: string) => {
@@ -451,7 +451,7 @@ const App: React.FC = () => {
           <h2 className="text-2xl font-black text-slate-800">Pengaturan Sistem</h2>
           <SettingsDashboard
             slaSettings={slaSettings}
-            onUpdateSla={handleUpdateSla}
+            onSaveSla={handleSaveSla}
             isAdmin={currentUser?.role?.toLowerCase() === 'superadmin' || currentUser?.role?.toLowerCase() === 'admin'}
           />
         </div>
