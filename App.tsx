@@ -419,7 +419,7 @@ const App: React.FC = () => {
       {activeView === 'tasks' && (
         <div className="space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-black text-slate-800">Daftar Tugas Saya</h2>
+            <h2 className="text-2xl font-black text-slate-800">Task</h2>
             <div className="px-4 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-xs font-bold border border-emerald-100 italic">
               Menampilkan {filteredTasks.length} pengajuan aktif
             </div>
