@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, MessageSquare, AlertTriangle, Clock, Calendar, User, Sparkles, Loader2, CheckCircle, FileText, ChevronRight, Pause, Play, CheckSquare, Square } from 'lucide-react';
 import { Task, TaskStage } from '../types';
-import { STAGES, getIcon, STAGE_SLA, DEFAULT_CHECKLISTS } from '../constants';
+import { STAGES, getIcon, STAGE_SLA } from '../constants';
 import { analyzeTask } from '../services/geminiService';
 
 interface TaskModalProps {
@@ -32,7 +32,8 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, canEdit, onClose, onUpdateS
   const currentStageIndex = STAGES.findIndex(s => s.id === task.stage);
   const updatedAt = new Date(task.stageUpdatedAt).getTime();
   const daysInStage = Math.floor((Date.now() - updatedAt) / (1000 * 60 * 60 * 24));
-  const slaLimit = STAGE_SLA[task.stage];
+  const slaLimit = STAGE_SLA[task.stage] || 0;
+  // Jika slaLimit adalah 0, maka tidak akan pernah dianggap overdue
   const isOverdue = slaLimit > 0 && daysInStage >= slaLimit && task.status !== 'On Hold';
   const isOnHold = task.status === 'On Hold';
 
