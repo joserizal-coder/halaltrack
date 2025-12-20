@@ -196,6 +196,8 @@ const App: React.FC = () => {
         name: formData.get('name') as string,
         company: formData.get('company') as string,
         description: formData.get('description') as string,
+        whatsapp: formData.get('whatsapp') as string,
+        address: formData.get('address') as string,
         stage: stage,
         assigned_to: currentUser.username
       })
@@ -203,6 +205,16 @@ const App: React.FC = () => {
       .single();
 
     if (newTask) {
+      const formattedTask: Task = {
+        ...newTask,
+        createdAt: newTask.created_at,
+        stageUpdatedAt: newTask.stage_updated_at,
+        assignedTo: newTask.assigned_to,
+        whatsapp: newTask.whatsapp,
+        address: newTask.address,
+        aiAnalysis: newTask.ai_analysis,
+        checklist: formatChecklistFromDB([])
+      };
       // Create initial checklists
       const checklistItems: any[] = [];
       STAGES.forEach(stage => {
@@ -344,7 +356,11 @@ const App: React.FC = () => {
               </div>
               <input name="name" placeholder="Nama Produk" className="w-full p-3 border rounded-xl bg-slate-50" required />
               <input name="company" placeholder="Perusahaan" className="w-full p-3 border rounded-xl bg-slate-50" required />
-              <textarea name="description" placeholder="Deskripsi" className="w-full p-3 border rounded-xl bg-slate-50 h-24"></textarea>
+              <div className="grid grid-cols-2 gap-4">
+                <input name="whatsapp" placeholder="Nomor WhatsApp" className="w-full p-3 border rounded-xl bg-slate-50" />
+                <input name="address" placeholder="Alamat Pelaku Usaha" className="w-full p-3 border rounded-xl bg-slate-50" />
+              </div>
+              <textarea name="description" placeholder="Deskripsi Singkat" className="w-full p-3 border rounded-xl bg-slate-50 h-24"></textarea>
               <button type="submit" className="w-full py-3 bg-emerald-600 text-white font-bold rounded-xl">Simpan ke Cloud</button>
               <button type="button" onClick={() => { setIsAddModalOpen(false); setIsAddingProspek(false); }} className="w-full py-3 text-slate-400 font-bold">Batal</button>
             </form>

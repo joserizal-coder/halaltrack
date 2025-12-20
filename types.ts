@@ -27,6 +27,8 @@ export interface Task {
   stageUpdatedAt: string;
   estimatedCompletion: string;
   assignedTo: string;
+  whatsapp?: string;
+  address?: string;
   aiAnalysis?: string;
   checklist: Record<TaskStage, TaskChecklistItem[]>;
 }

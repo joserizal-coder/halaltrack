@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
-import { X, Sparkles, Loader2, CheckCircle, ChevronRight, Clock, AlertTriangle, FileText, Calendar, User, Pause, Play, CheckSquare, Square } from 'lucide-react';
+import { X, MessageSquare, AlertTriangle, Clock, Calendar, User, Sparkles, Loader2, CheckCircle, FileText, ChevronRight, Pause, Play, CheckSquare, Square } from 'lucide-react';
 import { Task, TaskStage } from '../types';
-import { STAGES, getIcon, STAGE_SLA } from '../constants';
+import { STAGES, getIcon, STAGE_SLA, DEFAULT_CHECKLISTS } from '../constants';
 import { analyzeTask } from '../services/geminiService';
 
 interface TaskModalProps {
@@ -64,7 +63,21 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, canEdit, onClose, onUpdateS
                 <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">#{task.id.slice(0, 8)}</span>
               </div>
               <h2 className="text-3xl font-black text-slate-900 leading-tight">{task.name}</h2>
-              <p className="text-slate-400 font-bold uppercase tracking-widest text-xs mt-1">{task.company}</p>
+              <div className="flex flex-wrap items-center gap-4 mt-2">
+                <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">{task.company}</p>
+                {(task.whatsapp || task.address) && <div className="h-4 w-[1px] bg-slate-200"></div>}
+                {task.whatsapp && (
+                  <a
+                    href={`https://wa.me/${task.whatsapp.replace(/\D/g, '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 text-emerald-600 hover:text-emerald-700 font-black text-xs uppercase tracking-widest transition-colors"
+                  >
+                    <MessageSquare size={14} />
+                    Hubungi WA
+                  </a>
+                )}
+              </div>
             </div>
           </div>
           <button onClick={onClose} className="absolute top-8 right-8 p-3 text-slate-400 hover:text-slate-900 hover:bg-white rounded-2xl transition-all shadow-sm border border-transparent hover:border-slate-100 group">
@@ -106,6 +119,41 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, canEdit, onClose, onUpdateS
                   </div>
                 </div>
               )}
+
+              {/* Detail Pelaku Usaha */}
+              <div className="p-8 md:p-10 glass-panel rounded-[2.5rem] bg-white border-white/80">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                    <FileText size={18} />
+                  </div>
+                  <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">Detail Pelaku Usaha</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                  <div>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">Alamat Perusahaan</p>
+                    <p className="text-sm font-bold text-slate-700 leading-relaxed bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                      {task.address || 'Alamat belum diatur'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">Informasi Kontak</p>
+                    <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center justify-between">
+                      <span className="text-sm font-bold text-slate-700">{task.whatsapp || 'No. WA belum diatur'}</span>
+                      {task.whatsapp && (
+                        <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                          <MessageSquare size={16} />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-3">Deskripsi Singkat</h4>
+                  <p className="text-slate-600 text-[15px] font-medium leading-relaxed">
+                    {task.description || 'Tidak ada deskripsi tambahan.'}
+                  </p>
+                </div>
+              </div>
 
               {/* Modern Stepper */}
               <div className="p-8 glass-panel rounded-[2.5rem] overflow-x-auto custom-scrollbar border-white/80">
