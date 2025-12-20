@@ -30,101 +30,108 @@ const App: React.FC = () => {
   useEffect(() => {
     const initApp = async () => {
       setLoading(true);
+      try {
+        // Check Auth
+        const { data: { session }, error: authSessionError } = await supabase.auth.getSession();
 
-      // Check Auth
-      const { data: { session }, error: authSessionError } = await supabase.auth.getSession();
+        if (authSessionError) {
+          console.error('Auth session error:', authSessionError);
+        }
 
-      if (authSessionError) {
-        console.error('Auth session error:', authSessionError);
-      }
+        if (session) {
+          console.log('User session found:', session.user.email);
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
 
-      if (session) {
-        console.log('User session found:', session.user.email);
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
+          if (profileError && profileError.code !== 'PGRST116') {
+            console.error('Error fetching profile:', profileError);
+          }
+
+          if (profile) {
+            console.log('Profile found:', profile);
+            setCurrentUser({
+              id: session.user.id,
+              username: profile.username,
+              role: profile.role,
+              createdAt: profile.created_at || session.user.created_at
+            });
+          } else {
+            // Fallback: Check metadata if profile record is missing
+            console.warn('Profile not found in database, checking metadata...');
+            const meta = session.user.user_metadata;
+            const fallbackUsername = meta?.username || session.user.email?.split('@')[0] || 'User';
+            const fallbackRole = meta?.role || 'admin';
+
+            const userObj: UserAccount = {
+              id: session.user.id,
+              username: fallbackUsername,
+              role: fallbackRole as any,
+              createdAt: session.user.created_at
+            };
+
+            console.log('Using fallback user data:', userObj);
+            setCurrentUser(userObj);
+
+            // Proactively create profile if missing - wrapped in try/catch
+            try {
+              await supabase.from('profiles').upsert({
+                id: session.user.id,
+                username: fallbackUsername,
+                role: fallbackRole,
+              });
+            } catch (pErr) {
+              console.error('Failed to auto-create profile:', pErr);
+            }
+          }
+        } else {
+          console.log('No active session.');
+        }
+
+        // Fetch Tasks & Checklists
+        const { data: tasksData } = await supabase
+          .from('tasks')
+          .select(`*, checklists(*)`)
+          .order('created_at', { ascending: false });
+
+        if (tasksData) {
+          const formattedTasks = tasksData.map((t: any) => ({
+            ...t,
+            createdAt: t.created_at,
+            stageUpdatedAt: t.stage_updated_at,
+            assignedTo: t.assigned_to,
+            aiAnalysis: t.ai_analysis,
+            checklist: formatChecklistFromDB(t.checklists)
+          }));
+          setTasks(formattedTasks);
+        }
+
+        // Fetch Settings
+        const { data: settingsData } = await supabase
+          .from('settings')
           .select('*')
-          .eq('id', session.user.id)
+          .eq('key', 'sla_config')
           .single();
 
-        if (profileError && profileError.code !== 'PGRST116') {
-          console.error('Error fetching profile:', profileError);
+        if (settingsData) setSlaSettings(settingsData.value);
+
+        // Fetch Users
+        const { data: profilesData } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
+        if (profilesData) {
+          setUsers(profilesData.map(p => ({
+            id: p.id,
+            username: p.username,
+            role: p.role,
+            createdAt: p.created_at
+          })));
         }
-
-        if (profile) {
-          console.log('Profile found:', profile);
-          setCurrentUser({
-            id: session.user.id,
-            username: profile.username,
-            role: profile.role,
-            createdAt: profile.created_at || session.user.created_at
-          });
-        } else {
-          // Fallback: Check metadata if profile record is missing
-          console.warn('Profile not found in database, checking metadata...');
-          const meta = session.user.user_metadata;
-          const fallbackUsername = meta?.username || session.user.email?.split('@')[0] || 'User';
-          const fallbackRole = meta?.role || 'admin'; // Default as admin if metadata is missing for first user
-
-          const userObj: UserAccount = {
-            id: session.user.id,
-            username: fallbackUsername,
-            role: fallbackRole as any,
-            createdAt: session.user.created_at
-          };
-
-          console.log('Using fallback user data:', userObj);
-          setCurrentUser(userObj);
-
-          // Proactively create profile if missing
-          await supabase.from('profiles').upsert({
-            id: session.user.id,
-            username: fallbackUsername,
-            role: fallbackRole,
-          });
-        }
-      } else {
-        console.log('No active session.');
+      } catch (error) {
+        console.error('Critical error in initApp:', error);
+      } finally {
+        setLoading(false);
       }
-
-      // Fetch Tasks & Checklists
-      const { data: tasksData } = await supabase
-        .from('tasks')
-        .select(`*, checklists(*)`)
-        .order('created_at', { ascending: false });
-
-      if (tasksData) {
-        const formattedTasks = tasksData.map((t: any) => ({
-          ...t,
-          createdAt: t.created_at,
-          stageUpdatedAt: t.stage_updated_at,
-          assignedTo: t.assigned_to,
-          aiAnalysis: t.ai_analysis,
-          checklist: formatChecklistFromDB(t.checklists)
-        }));
-        setTasks(formattedTasks);
-      }
-
-      // Fetch Settings
-      const { data: settingsData } = await supabase
-        .from('settings')
-        .select('*')
-        .eq('key', 'sla_config')
-        .single();
-
-      if (settingsData) setSlaSettings(settingsData.value);
-
-      // Fetch Users
-      const { data: profilesData } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
-      if (profilesData) {
-        setUsers(profilesData.map(p => ({
-          id: p.id,
-          username: p.username,
-          role: p.role,
-          createdAt: p.created_at
-        })));
-      }
-
-      setLoading(false);
     };
 
     initApp();
@@ -142,14 +149,23 @@ const App: React.FC = () => {
   };
 
   const handleLogin = async (username: string, pass: string): Promise<boolean> => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: `${username}@halaltrack.com`, // Email dummy karena Supabase Auth butuh email
-      password: pass
-    });
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: `${username}@halaltrack.com`,
+        password: pass
+      });
 
-    if (data.user) {
-      window.location.reload(); // Refresh untuk trigger useEffect init
-      return true;
+      if (error) {
+        console.error('Login error:', error.message);
+        return false;
+      }
+
+      if (data.user) {
+        window.location.reload();
+        return true;
+      }
+    } catch (err) {
+      console.error('Unexpected login error:', err);
     }
     return false;
   };
@@ -221,7 +237,6 @@ const App: React.FC = () => {
       return false;
     }
 
-    // Supabase Auth butuh email, kita buat dummy email dari username
     const email = `${user.username}@halaltrack.com`;
 
     try {
@@ -246,8 +261,6 @@ const App: React.FC = () => {
       }
 
       if (data.user) {
-        // Update profile dengan username dan role yang benar
-        // Supabase biasanya otomatis buat profile via trigger, tapi kalau tidak kita masukkan manual
         const { error: profileError } = await supabase
           .from('profiles')
           .upsert({
@@ -310,7 +323,7 @@ const App: React.FC = () => {
         aiAnalysis: newTask.ai_analysis,
         checklist: formatChecklistFromDB([])
       };
-      // Create initial checklists
+
       const checklistItems: any[] = [];
       STAGES.forEach(stage => {
         (DEFAULT_CHECKLISTS[stage.id] || []).forEach(label => {
