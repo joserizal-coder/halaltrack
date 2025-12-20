@@ -237,9 +237,32 @@ const App: React.FC = () => {
   };
 
   const handleDeleteUser = async (userId: string) => {
-    if (confirm('Hapus user ini?')) {
-      const { error } = await supabase.from('profiles').delete().eq('id', userId);
-      if (!error) setUsers(prev => prev.filter(u => u.id !== userId));
+    if (!confirm('Hapus user ini? Tindakan ini tidak dapat dibatalkan.')) return;
+
+    try {
+      // Delete from Supabase Auth using admin API
+      const { error: authError } = await supabase.auth.admin.deleteUser(userId);
+
+      if (authError) {
+        console.error('Error deleting auth user:', authError);
+        alert(`Gagal menghapus user dari Auth: ${authError.message}`);
+        return;
+      }
+
+      // Delete from profiles table (should cascade automatically, but we do it explicitly)
+      const { error: profileError } = await supabase.from('profiles').delete().eq('id', userId);
+
+      if (profileError) {
+        console.error('Error deleting profile:', profileError);
+        alert(`User dihapus dari Auth, tapi gagal menghapus profile: ${profileError.message}`);
+      }
+
+      // Update UI
+      setUsers(prev => prev.filter(u => u.id !== userId));
+      alert('User berhasil dihapus!');
+    } catch (err) {
+      console.error('Unexpected error during user deletion:', err);
+      alert('Terjadi kesalahan tidak terduga saat menghapus user.');
     }
   };
 
