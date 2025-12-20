@@ -73,7 +73,7 @@ const Layout: React.FC<LayoutProps> = ({
             className={`w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl font-bold transition-all duration-300 group ${activeView === 'tasks' ? 'nav-button-active' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'}`}
           >
             <ListTodo size={22} className={activeView === 'tasks' ? '' : 'group-hover:scale-110 transition-transform'} />
-            <span className="text-[15px]">Tugas Saya</span>
+            <span className="text-[15px]">Task</span>
           </button>
 
           <button
@@ -143,6 +143,23 @@ const Layout: React.FC<LayoutProps> = ({
             </button>
           )}
         </div>
+
+        {/* Copyright */}
+        <div className="px-6 pb-6 mt-auto">
+          <div className="text-center pt-4 border-t border-slate-100">
+            <p className="text-[9px] text-slate-400 font-medium leading-relaxed">
+              © 2026 LPH UNISMA
+            </p>
+            <a
+              href="https://www.lph.unisma.ac.id"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[9px] text-emerald-600 hover:text-emerald-700 font-semibold transition-colors"
+            >
+              www.lph.unisma.ac.id
+            </a>
+          </div>
+        </div>
       </aside>
 
       {/* Mobile Menu Backdrop */}
@@ -181,7 +198,7 @@ const Layout: React.FC<LayoutProps> = ({
             className={`w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl font-bold transition-all ${activeView === 'tasks' ? 'nav-button-active' : 'text-slate-500'}`}
           >
             <ListTodo size={20} />
-            <span className="text-[14px]">Tugas Saya</span>
+            <span className="text-[14px]">Task</span>
           </button>
           <button
             onClick={() => { onToggleNotifications?.(); setIsMobileMenuOpen(false); }}
