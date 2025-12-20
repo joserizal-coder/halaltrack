@@ -32,22 +32,58 @@ const App: React.FC = () => {
       setLoading(true);
 
       // Check Auth
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session }, error: authSessionError } = await supabase.auth.getSession();
+
+      if (authSessionError) {
+        console.error('Auth session error:', authSessionError);
+      }
+
       if (session) {
-        const { data: profile } = await supabase
+        console.log('User session found:', session.user.email);
+        const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', session.user.id)
           .single();
 
+        if (profileError && profileError.code !== 'PGRST116') {
+          console.error('Error fetching profile:', profileError);
+        }
+
         if (profile) {
+          console.log('Profile found:', profile);
           setCurrentUser({
             id: session.user.id,
             username: profile.username,
             role: profile.role,
+            createdAt: profile.created_at || session.user.created_at
+          });
+        } else {
+          // Fallback: Check metadata if profile record is missing
+          console.warn('Profile not found in database, checking metadata...');
+          const meta = session.user.user_metadata;
+          const fallbackUsername = meta?.username || session.user.email?.split('@')[0] || 'User';
+          const fallbackRole = meta?.role || 'admin'; // Default as admin if metadata is missing for first user
+
+          const userObj: UserAccount = {
+            id: session.user.id,
+            username: fallbackUsername,
+            role: fallbackRole as any,
             createdAt: session.user.created_at
+          };
+
+          console.log('Using fallback user data:', userObj);
+          setCurrentUser(userObj);
+
+          // Proactively create profile if missing
+          await supabase.from('profiles').upsert({
+            id: session.user.id,
+            username: fallbackUsername,
+            role: fallbackRole,
           });
         }
+      } else {
+        console.log('No active session.');
       }
 
       // Fetch Tasks & Checklists
