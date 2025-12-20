@@ -451,7 +451,7 @@ const App: React.FC = () => {
           <SettingsDashboard
             slaSettings={slaSettings}
             onUpdateSla={handleUpdateSla}
-            isAdmin={currentUser?.role === 'superadmin' || currentUser?.role === 'admin'}
+            isAdmin={currentUser?.role?.toLowerCase() === 'superadmin' || currentUser?.role?.toLowerCase() === 'admin'}
           />
         </div>
       )}
