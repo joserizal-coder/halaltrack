@@ -240,16 +240,13 @@ const App: React.FC = () => {
     if (!confirm('Hapus user ini? Tindakan ini tidak dapat dibatalkan.')) return;
 
     try {
-      // Delete from Supabase Auth using admin API
-      const { error: authError } = await supabase.auth.admin.deleteUser(userId);
+      // Note: supabase.auth.admin.deleteUser() requires service role key
+      // which cannot be exposed in client-side code for security reasons.
+      // We only delete the profile here.
 
-      if (authError) {
-        console.error('Error deleting auth user:', authError);
-        alert(`Gagal menghapus user dari Auth: ${authError.message}`);
-        return;
-      }
 
-      // Delete from profiles table (should cascade automatically, but we do it explicitly)
+
+
 
       const { error: profileError } = await supabase
         .from('profiles')
