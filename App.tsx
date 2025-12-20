@@ -231,9 +231,21 @@ const App: React.FC = () => {
   };
 
   const handleSaveSla = async (newSettings: Record<TaskStage, number>) => {
-    setSlaSettings(newSettings);
-    await supabase.from('settings').update({ value: newSettings }).eq('key', 'sla_config');
-    alert('Pengaturan SLA berhasil disimpan!');
+    try {
+      const { error } = await supabase
+        .from('settings')
+        .upsert({ key: 'sla_config', value: newSettings }, { onConflict: 'key' });
+
+      if (error) {
+        throw error;
+      }
+
+      setSlaSettings(newSettings);
+      alert('Pengaturan SLA berhasil disimpan!');
+    } catch (err: any) {
+      console.error('Error saving SLA:', err);
+      alert(`Gagal menyimpan pengaturan: ${err.message || 'Unknown error'}`);
+    }
   };
 
   const handleDeleteUser = async (userId: string) => {

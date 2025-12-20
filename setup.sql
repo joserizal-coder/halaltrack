@@ -60,6 +60,8 @@ CREATE POLICY "Enable Read for all" ON public.checklists FOR SELECT USING (true)
 CREATE POLICY "Enable Update for all" ON public.checklists FOR ALL USING (true);
 
 CREATE POLICY "Enable Read for all settings" ON public.settings FOR SELECT USING (true);
+CREATE POLICY "Enable Update for authenticated users" ON public.settings FOR UPDATE USING (auth.role() = 'authenticated');
+CREATE POLICY "Enable Insert for authenticated users" ON public.settings FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 
 -- Insert Default Settings (SLA Config)
 INSERT INTO public.settings (key, value) VALUES ('sla_config', '{"Submitted": 1, "Penetapan Harga": 2, "Pra audit": 3, "Audit": 7, "Review": 3, "Sidang Komisi Fatwa": 2, "Sertifikat Terbit": 1}')
