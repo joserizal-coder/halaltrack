@@ -225,8 +225,10 @@ const App: React.FC = () => {
 
   const overdueTasks = useMemo(() => {
     return tasks.filter(t => {
+      const slaLimit = slaSettings[t.stage] || 0;
+      if (slaLimit === 0) return false;
       const days = Math.floor((Date.now() - new Date(t.stageUpdatedAt).getTime()) / (1000 * 60 * 60 * 24));
-      return days >= (slaSettings[t.stage] || 0) && t.status !== 'On Hold';
+      return days >= slaLimit && t.status !== 'On Hold';
     });
   }, [tasks, slaSettings]);
 

@@ -49,19 +49,16 @@ const TaskTable: React.FC<TaskTableProps> = ({ tasks, canEdit, onOpenDetail, onM
                   <td className="px-6 py-5">
                     <div className="flex items-center gap-2">
                       {slaLimit === 0 ? (
-                        <div className="flex items-center gap-1.5 text-slate-400 font-bold text-xs">
-                          <CheckCircle size={14} />
-                          <span>No Limit</span>
-                        </div>
+                        <span className="text-slate-400 font-bold text-[11px] uppercase tracking-wider">Fleksibel</span>
                       ) : isOverdue ? (
                         <div className="flex items-center gap-1.5 text-red-600 font-bold text-xs">
                           <AlertCircle size={14} />
-                          <span>Overdue ({days}d)</span>
+                          <span>Terlambat ({days}h)</span>
                         </div>
                       ) : (
                         <div className="flex items-center gap-1.5 text-emerald-600 font-bold text-xs">
                           <Clock size={14} />
-                          <span>{days}d / {slaLimit}d</span>
+                          <span>{days}j / {slaLimit}j</span>
                         </div>
                       )}
                     </div>

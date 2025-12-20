@@ -35,7 +35,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, canEdit, onMoveForward, onOpe
         </div>
 
         <div className="flex gap-2">
-          {isOverdue && (
+          {isOverdue && slaLimit > 0 && (
             <div className="bg-rose-500 text-white text-[9px] font-black px-2.5 py-1 rounded-full flex items-center gap-1.5 uppercase tracking-wider animate-pulse shadow-lg shadow-rose-200">
               <AlertCircle size={12} /> Terlambat
             </div>
@@ -61,13 +61,13 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, canEdit, onMoveForward, onOpe
           </div>
           <p className="text-[11px] font-bold text-slate-700">{new Date(task.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</p>
         </div>
-        <div className={`p-2.5 rounded-2xl border ${isOverdue ? 'bg-rose-50/50 border-rose-100/50' : 'bg-slate-50/50 border-slate-100/50'}`}>
-          <div className={`flex items-center gap-2 mb-1 ${isOverdue ? 'text-rose-500' : 'text-slate-400'}`}>
+        <div className={`p-2.5 rounded-2xl border ${isOverdue && slaLimit > 0 ? 'bg-rose-50/50 border-rose-100/50' : 'bg-slate-50/50 border-slate-100/50'}`}>
+          <div className={`flex items-center gap-2 mb-1 ${isOverdue && slaLimit > 0 ? 'text-rose-500' : 'text-slate-400'}`}>
             <Clock size={13} />
-            <span className="text-[9px] font-black uppercase tracking-wider">Durasi</span>
+            <span className="text-[9px] font-black uppercase tracking-wider">{slaLimit > 0 ? 'Durasi' : 'Diproses'}</span>
           </div>
-          <p className={`text-[11px] font-bold ${isOverdue ? 'text-rose-600' : 'text-slate-700'}`}>
-            {daysInStage}h <span className="text-slate-300 mx-0.5">/</span> {slaLimit}h
+          <p className={`text-[11px] font-bold ${isOverdue && slaLimit > 0 ? 'text-rose-600' : 'text-slate-700'}`}>
+            {daysInStage} Hari {slaLimit > 0 && <span className="text-slate-300 mx-0.5">/ {slaLimit}h</span>}
           </p>
         </div>
       </div>

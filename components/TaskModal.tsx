@@ -245,12 +245,19 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, canEdit, onClose, onUpdateS
                     <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border shadow-sm ${isOverdue ? 'bg-rose-50 border-rose-100 text-rose-500' : 'bg-blue-50 border-blue-100 text-blue-500'}`}>
                       <Clock size={22} />
                     </div>
-                    <div>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Lama Di Tahap Ini</p>
-                      <p className={`text-sm font-black ${isOverdue ? 'text-rose-600' : 'text-slate-900'}`}>
-                        {daysInStage} Hari {slaLimit > 0 ? <span className="text-[10px] opacity-40 font-bold">/ Limit {slaLimit}h</span> : <span className="text-[10px] opacity-40 font-bold">(No Limit)</span>}
-                      </p>
-                    </div>
+                    {slaLimit > 0 ? (
+                      <div>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Lama Di Tahap Ini</p>
+                        <p className={`text-sm font-black ${isOverdue ? 'text-rose-600' : 'text-slate-900'}`}>
+                          {daysInStage} Hari <span className="text-[10px] opacity-40 font-bold">/ Limit {slaLimit}h</span>
+                        </p>
+                      </div>
+                    ) : (
+                      <div>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Status Tahap</p>
+                        <p className="text-sm font-black text-slate-900">Sedang Diproses</p>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex items-center gap-4">
