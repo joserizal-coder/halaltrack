@@ -95,8 +95,9 @@ const App: React.FC = () => {
 
   const formatChecklistFromDB = (dbItems: any[]) => {
     const checklist: any = {};
+    const items = dbItems || [];
     STAGES.forEach(stage => {
-      checklist[stage.id] = dbItems
+      checklist[stage.id] = items
         .filter(item => item.stage === stage.id)
         .map(item => ({ id: item.id, label: item.label, completed: item.completed }));
     });
@@ -235,6 +236,7 @@ const App: React.FC = () => {
       onSearch={setSearchQuery}
       onAddNew={() => setIsAddModalOpen(true)}
       onToggleNotifications={() => setShowNotifications(!showNotifications)}
+      overdueCount={overdueTasks.length}
       onNavigate={setActiveView}
       onLoginClick={() => setIsLoginModalOpen(true)}
       onLogout={handleLogout}
@@ -299,7 +301,7 @@ const App: React.FC = () => {
           <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-white/50">
             <h3 className="text-lg font-black text-slate-900">Notifikasi Penting</h3>
             <button onClick={() => setShowNotifications(false)} className="text-slate-400 hover:text-slate-900">
-              <svg size={20} className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
           </div>
           <div className="max-h-[500px] overflow-y-auto custom-scrollbar p-4 space-y-3">

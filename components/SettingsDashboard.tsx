@@ -14,7 +14,7 @@ const SettingsDashboard: React.FC<SettingsDashboardProps> = ({ slaSettings, onUp
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
+
         {/* SLA Configuration */}
         <div className="lg:col-span-2">
           <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
@@ -32,7 +32,7 @@ const SettingsDashboard: React.FC<SettingsDashboardProps> = ({ slaSettings, onUp
                 <span className="text-[10px] font-black text-amber-600 bg-amber-50 px-2 py-1 rounded-full uppercase">Read Only</span>
               )}
             </div>
-            
+
             <div className="p-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {STAGES.map((stage) => (
@@ -42,8 +42,8 @@ const SettingsDashboard: React.FC<SettingsDashboardProps> = ({ slaSettings, onUp
                       <p className="text-sm font-bold text-slate-700">Target Durasi</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <input 
-                        type="number" 
+                      <input
+                        type="number"
                         min="1"
                         disabled={!isAdmin}
                         value={slaSettings[stage.id] || 0}
@@ -78,7 +78,7 @@ const SettingsDashboard: React.FC<SettingsDashboardProps> = ({ slaSettings, onUp
                 <span className="text-sm text-slate-500 font-medium">Database Status</span>
                 <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
                   <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
-                  Local Storage OK
+                  Database Connected
                 </span>
               </div>
               <div className="flex items-center justify-between py-2">
@@ -99,7 +99,7 @@ const SettingsDashboard: React.FC<SettingsDashboardProps> = ({ slaSettings, onUp
               Gunakan fungsi ini untuk membersihkan cache atau mereset aplikasi ke pengaturan pabrik.
             </p>
             <div className="space-y-3">
-              <button 
+              <button
                 onClick={() => window.location.reload()}
                 className="w-full py-3 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all"
               >
@@ -107,9 +107,9 @@ const SettingsDashboard: React.FC<SettingsDashboardProps> = ({ slaSettings, onUp
                 Segarkan Cache
               </button>
               {isAdmin && (
-                <button 
+                <button
                   onClick={() => {
-                    if(confirm("Hapus SEMUA data task dan user? Tindakan ini tidak dapat dibatalkan.")) {
+                    if (confirm("Hapus SEMUA data task dan user? Tindakan ini tidak dapat dibatalkan.")) {
                       localStorage.clear();
                       window.location.reload();
                     }

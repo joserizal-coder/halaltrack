@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { LayoutDashboard, ListTodo, Settings, Bell, Search as SearchIcon, Plus, ShieldCheck, LogIn, LogOut } from 'lucide-react';
+import { LayoutDashboard, ListTodo, Settings, Bell, Search as SearchIcon, Plus, ShieldCheck, LogIn, LogOut, Menu, X } from 'lucide-react';
 import { UserAccount } from '../types';
 import BrandLogo from './BrandLogo';
 
@@ -29,6 +29,7 @@ const Layout: React.FC<LayoutProps> = ({
   onLoginClick,
   onLogout
 }) => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const isAdmin = currentUser?.role === 'Admin';
   const isLoggedIn = !!currentUser;
 
@@ -54,7 +55,7 @@ const Layout: React.FC<LayoutProps> = ({
           </div>
 
           <button
-            onClick={() => onNavigate?.('dashboard')}
+            onClick={() => { onNavigate?.('dashboard'); setIsMobileMenuOpen(false); }}
             className={`w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl font-bold transition-all duration-300 group ${activeView === 'dashboard' ? 'nav-button-active' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'}`}
           >
             <LayoutDashboard size={22} className={activeView === 'dashboard' ? '' : 'group-hover:scale-110 transition-transform'} />
@@ -62,7 +63,7 @@ const Layout: React.FC<LayoutProps> = ({
           </button>
 
           <button
-            onClick={() => onNavigate?.('tasks')}
+            onClick={() => { onNavigate?.('tasks'); setIsMobileMenuOpen(false); }}
             className={`w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl font-bold transition-all duration-300 group ${activeView === 'tasks' ? 'nav-button-active' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'}`}
           >
             <ListTodo size={22} className={activeView === 'tasks' ? '' : 'group-hover:scale-110 transition-transform'} />
@@ -70,7 +71,7 @@ const Layout: React.FC<LayoutProps> = ({
           </button>
 
           <button
-            onClick={onToggleNotifications}
+            onClick={() => { onToggleNotifications?.(); setIsMobileMenuOpen(false); }}
             className="w-full flex items-center gap-4 px-5 py-3.5 text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-2xl font-bold transition-all relative group"
           >
             <Bell size={22} className="group-hover:animate-bounce-short" />
@@ -88,7 +89,7 @@ const Layout: React.FC<LayoutProps> = ({
 
           {isAdmin && (
             <button
-              onClick={() => onNavigate?.('admin')}
+              onClick={() => { onNavigate?.('admin'); setIsMobileMenuOpen(false); }}
               className={`w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl font-bold transition-all duration-300 group ${activeView === 'admin' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200/50' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'}`}
             >
               <ShieldCheck size={22} className={activeView === 'admin' ? '' : 'group-hover:scale-110 transition-transform'} />
@@ -97,7 +98,7 @@ const Layout: React.FC<LayoutProps> = ({
           )}
 
           <button
-            onClick={() => onNavigate?.('settings')}
+            onClick={() => { onNavigate?.('settings'); setIsMobileMenuOpen(false); }}
             className={`w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl font-bold transition-all duration-300 group ${activeView === 'settings' ? 'bg-slate-900 text-white shadow-lg shadow-slate-200/50' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'}`}
           >
             <Settings size={22} />
@@ -137,20 +138,105 @@ const Layout: React.FC<LayoutProps> = ({
         </div>
       </aside>
 
+      {/* Mobile Menu Backdrop */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[55] md:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Mobile Sidebar */}
+      <aside className={`fixed inset-y-0 left-0 w-72 bg-white z-[60] md:hidden transform transition-transform duration-300 ease-out flex flex-col ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="p-8 flex justify-between items-center">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 premium-gradient-green text-white rounded-xl flex items-center justify-center">
+              <ShieldCheck size={24} />
+            </div>
+            <h1 className="text-base font-black text-slate-900 tracking-tight">HALAL<span className="text-emerald-600">TRACK</span></h1>
+          </div>
+          <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 text-slate-400 hover:text-slate-900">
+            <X size={20} />
+          </button>
+        </div>
+
+        <nav className="flex-1 px-4 py-2 space-y-2 overflow-y-auto">
+          {/* Re-use buttons but with onClick toggle */}
+          <button
+            onClick={() => { onNavigate?.('dashboard'); setIsMobileMenuOpen(false); }}
+            className={`w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl font-bold transition-all ${activeView === 'dashboard' ? 'nav-button-active' : 'text-slate-500'}`}
+          >
+            <LayoutDashboard size={20} />
+            <span className="text-[14px]">Dashboard</span>
+          </button>
+          <button
+            onClick={() => { onNavigate?.('tasks'); setIsMobileMenuOpen(false); }}
+            className={`w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl font-bold transition-all ${activeView === 'tasks' ? 'nav-button-active' : 'text-slate-500'}`}
+          >
+            <ListTodo size={20} />
+            <span className="text-[14px]">Tugas Saya</span>
+          </button>
+          <button
+            onClick={() => { onToggleNotifications?.(); setIsMobileMenuOpen(false); }}
+            className="w-full flex items-center gap-4 px-5 py-3.5 text-slate-500 rounded-2xl font-bold relative"
+          >
+            <Bell size={20} />
+            <span className="text-[14px]">Notifikasi</span>
+            {overdueCount > 0 && <span className="absolute right-5 bg-rose-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">{overdueCount}</span>}
+          </button>
+
+          {isAdmin && (
+            <button
+              onClick={() => { onNavigate?.('admin'); setIsMobileMenuOpen(false); }}
+              className={`w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl font-bold transition-all ${activeView === 'admin' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}
+            >
+              <ShieldCheck size={20} />
+              <span className="text-[14px]">Admin Panel</span>
+            </button>
+          )}
+
+          <button
+            onClick={() => { onNavigate?.('settings'); setIsMobileMenuOpen(false); }}
+            className={`w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl font-bold transition-all ${activeView === 'settings' ? 'bg-slate-900 text-white' : 'text-slate-500'}`}
+          >
+            <Settings size={20} />
+            <span className="text-[14px]">Pengaturan</span>
+          </button>
+        </nav>
+
+        <div className="p-6 border-t border-slate-100">
+          {isLoggedIn ? (
+            <button onClick={() => { onLogout?.(); setIsMobileMenuOpen(false); }} className="w-full py-3 text-sm font-bold text-rose-500 flex items-center justify-center gap-2">
+              <LogOut size={16} /> Keluar
+            </button>
+          ) : (
+            <button onClick={() => { onLoginClick?.(); setIsMobileMenuOpen(false); }} className="w-full py-3 premium-gradient-green text-white font-bold rounded-xl flex items-center justify-center gap-2">
+              <LogIn size={16} /> Masuk Akun
+            </button>
+          )}
+        </div>
+      </aside>
+
       {/* Main Content */}
-      <main id="main-content" className="flex-1 flex flex-col min-h-screen overflow-auto relative scroll-smooth bg-slate-50/50">
+      <main id="main-content" className="flex-1 flex flex-col min-h-screen overflow-x-hidden relative scroll-smooth bg-slate-50/50">
         {/* Header */}
-        <header className="h-24 glass-panel border-b-0 flex items-center justify-between px-8 md:px-12 sticky top-0 z-40 mx-4 mt-4 rounded-3xl shadow-sm">
-          <div className="flex items-center gap-6 flex-1">
+        <header className="h-20 md:h-24 glass-panel border-b-0 flex items-center justify-between px-4 md:px-12 sticky top-0 z-40 md:mx-4 md:mt-4 md:rounded-3xl shadow-sm">
+          <div className="flex items-center gap-4 md:gap-6 flex-1">
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="md:hidden p-2 text-slate-500 hover:text-slate-900"
+            >
+              <Menu size={24} />
+            </button>
             <div className="relative max-w-lg w-full group">
-              <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors">
-                <SearchIcon size={20} />
+              <span className="absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors">
+                <SearchIcon size={18} />
               </span>
               <input
                 type="text"
                 onChange={(e) => onSearch?.(e.target.value)}
-                placeholder="Cari ID, Perusahaan, atau Produk..."
-                className="w-full pl-14 pr-6 py-4 bg-white/50 border border-slate-200/60 rounded-2xl text-[15px] font-semibold focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500/50 focus:bg-white transition-all shadow-sm"
+                placeholder="Cari..."
+                className="w-full pl-11 md:pl-14 pr-4 md:pr-6 py-2.5 md:py-4 bg-white/50 border border-slate-200/60 rounded-xl md:rounded-2xl text-sm md:text-[15px] font-semibold focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500/50 focus:bg-white transition-all shadow-sm"
               />
             </div>
           </div>
@@ -187,7 +273,7 @@ const Layout: React.FC<LayoutProps> = ({
           </div>
         </header>
 
-        <div className="p-8 md:p-12 animate-in">
+        <div className="px-4 md:px-12 py-8 md:py-12">
           {children}
         </div>
       </main>
