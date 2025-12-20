@@ -1,7 +1,7 @@
-
 import React from 'react';
+import { Plus } from 'lucide-react';
 import { Task, TaskStage } from '../types';
-import { STAGES } from '../constants';
+import { STAGES, getIcon } from '../constants';
 import TaskCard from './TaskCard';
 
 interface KanbanBoardProps {
@@ -77,6 +77,4 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, canEdit, onMoveForward
   );
 };
 
-import { Plus } from 'lucide-react';
-import { getIcon } from '../constants';
 export default KanbanBoard;

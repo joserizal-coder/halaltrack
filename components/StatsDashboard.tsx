@@ -1,6 +1,6 @@
-
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { ListTodo, Calendar } from 'lucide-react';
 import { Task, TaskStage } from '../types';
 import { STAGES } from '../constants';
 
@@ -12,7 +12,7 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({ tasks }) => {
   const data = STAGES.map(stage => ({
     name: stage.label,
     count: tasks.filter(t => t.stage === stage.id).length,
-    color: stage.color?.includes('#') ? stage.color : '#6466f1' // Fallback
+    color: '#6366f1' // Defaulting to indigo for a unified premium look
   }));
 
   const totalTasks = tasks.length;
@@ -43,10 +43,6 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({ tasks }) => {
                   <stop offset="0%" stopColor="#10b981" />
                   <stop offset="100%" stopColor="#059669" />
                 </linearGradient>
-                <linearGradient id="activeGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#6366f1" />
-                  <stop offset="100%" stopColor="#4f46e5" />
-                </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="8 8" vertical={false} stroke="#e2e8f0" strokeOpacity={0.5} />
               <XAxis
@@ -72,15 +68,7 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({ tasks }) => {
                   fontWeight: '800'
                 }}
               />
-              <Bar dataKey="count" radius={[12, 12, 12, 12]} barSize={32}>
-                {data.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={index === currentStageIndex ? 'url(#activeGradient)' : 'url(#barGradient)'}
-                    fillOpacity={index === currentStageIndex ? 1 : 0.6}
-                  />
-                ))}
-              </Bar>
+              <Bar dataKey="count" fill="url(#barGradient)" radius={[12, 12, 12, 12]} barSize={32} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -141,5 +129,4 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({ tasks }) => {
   );
 };
 
-import { ListTodo, Calendar } from 'lucide-react';
 export default StatsDashboard;
