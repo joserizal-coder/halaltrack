@@ -148,12 +148,24 @@ const App: React.FC = () => {
     return checklist;
   };
 
-  const handleLogin = async (username: string, pass: string): Promise<boolean> => {
+  const handleLogin = async (input: string, pass: string): Promise<boolean> => {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: `${username}@halaltrack.com`,
+      // 1. Try with raw input first (could be full email)
+      let { data, error } = await supabase.auth.signInWithPassword({
+        email: input,
         password: pass
       });
+
+      // 2. Fallback: try with @halaltrack.com if it's likely a username (no @)
+      if (error && !input.includes('@')) {
+        const usernameEmail = `${input.toLowerCase()}@halaltrack.com`;
+        const { data: retryData, error: retryError } = await supabase.auth.signInWithPassword({
+          email: usernameEmail,
+          password: pass
+        });
+        data = retryData;
+        error = retryError;
+      }
 
       if (error) {
         console.error('Login error:', error.message);
