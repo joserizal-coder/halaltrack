@@ -22,92 +22,106 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, canEdit, onMoveForward, onOpe
   const isOnHold = task.status === 'On Hold';
 
   return (
-    <div 
-      className={`bg-white border rounded-xl p-4 shadow-sm hover:shadow-md transition-all group cursor-pointer relative overflow-visible ${isOverdue ? 'border-red-200 ring-1 ring-red-100' : 'border-slate-200'} ${isOnHold ? 'opacity-70 grayscale-[0.5]' : ''}`}
+    <div
+      className={`glass-card p-5 group cursor-pointer relative overflow-visible rounded-[2rem] border-white/60 ${isOverdue ? 'ring-2 ring-rose-500/20 border-rose-100 bg-rose-50/30' : ''} ${isOnHold ? 'opacity-80 grayscale-[0.2] bg-slate-50/50' : ''}`}
       onClick={() => onOpenDetail(task)}
     >
-      {isOverdue && (
-        <div className="absolute top-0 right-0 z-10">
-          <div className="bg-red-500 text-white text-[9px] font-black px-2 py-0.5 rounded-bl-lg flex items-center gap-1 uppercase tracking-tighter">
-            <AlertCircle size={10} /> Overdue
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex -space-x-3">
+          <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${task.assignedTo}`} alt="Assignee" className="w-9 h-9 rounded-2xl border-2 border-white shadow-sm" />
+          <div className="w-9 h-9 rounded-2xl bg-white border-2 border-white shadow-sm flex items-center justify-center text-[10px] font-black text-slate-400">
+            +{Math.floor(Math.random() * 3)}
           </div>
         </div>
-      )}
 
-      {isOnHold && (
-        <div className="absolute top-0 right-0 z-10">
-          <div className="bg-slate-500 text-white text-[9px] font-black px-2 py-0.5 rounded-bl-lg flex items-center gap-1 uppercase tracking-tighter">
-            <Pause size={10} /> On Hold
-          </div>
-        </div>
-      )}
-      
-      <div className="flex justify-end items-start mb-2 relative">
-        <div className="relative">
-          {canEdit && (
-            <button 
-              onClick={(e) => { e.stopPropagation(); setShowMenu(!showMenu); }}
-              className="text-slate-400 hover:text-slate-600 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-slate-100 rounded"
-            >
-              <MoreVertical size={16} />
-            </button>
+        <div className="flex gap-2">
+          {isOverdue && (
+            <div className="bg-rose-500 text-white text-[9px] font-black px-2.5 py-1 rounded-full flex items-center gap-1.5 uppercase tracking-wider animate-pulse shadow-lg shadow-rose-200">
+              <AlertCircle size={12} /> Terlambat
+            </div>
           )}
-          
-          {showMenu && canEdit && (
-            <div className="absolute right-0 mt-1 w-32 bg-white rounded-xl shadow-xl border border-slate-100 z-50 py-1 overflow-hidden animate-in fade-in zoom-in duration-100">
-              <button 
-                onClick={(e) => { e.stopPropagation(); onToggleHold(task.id); setShowMenu(false); }}
-                className="w-full text-left px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 flex items-center gap-2"
-              >
-                {isOnHold ? <Play size={14} className="text-blue-500" /> : <Pause size={14} className="text-amber-500" />}
-                {isOnHold ? 'Resume' : 'Hold'}
-              </button>
-              <button 
-                onClick={(e) => { e.stopPropagation(); onDelete(task.id); setShowMenu(false); }}
-                className="w-full text-left px-3 py-2 text-xs font-bold text-red-500 hover:bg-red-50 flex items-center gap-2"
-              >
-                <Trash2 size={14} />
-                Delete
-              </button>
+          {isOnHold && (
+            <div className="bg-amber-500 text-white text-[9px] font-black px-2.5 py-1 rounded-full flex items-center gap-1.5 uppercase tracking-wider shadow-lg shadow-amber-200">
+              <Pause size={12} /> Dihentikan
             </div>
           )}
         </div>
       </div>
-      
-      <h4 className="font-semibold text-slate-800 text-sm mb-1 leading-tight">{task.name}</h4>
-      {canEdit && <p className="text-xs text-slate-500 mb-3 line-clamp-1">{task.company}</p>}
-      
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-4">
-        <div className="flex items-center gap-1 text-[11px] text-slate-400">
-          <Calendar size={12} />
-          <span>{new Date(task.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</span>
+
+      <div className="mb-4">
+        <h4 className="font-black text-slate-900 text-base mb-1 leading-tight group-hover:text-emerald-600 transition-colors">{task.name}</h4>
+        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{task.company}</p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 mb-5">
+        <div className="bg-slate-50/50 p-2.5 rounded-2xl border border-slate-100/50">
+          <div className="flex items-center gap-2 text-slate-400 mb-1">
+            <Calendar size={13} />
+            <span className="text-[9px] font-black uppercase tracking-wider">Terdaftar</span>
+          </div>
+          <p className="text-[11px] font-bold text-slate-700">{new Date(task.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</p>
         </div>
-        <div className="flex items-center gap-1 text-[11px] text-slate-400">
-          <User size={12} />
-          <span>{task.assignedTo}</span>
-        </div>
-        <div className={`flex items-center gap-1 text-[11px] font-medium ${isOverdue ? 'text-red-600' : 'text-slate-400'}`}>
-          <Clock size={12} />
-          <span>{daysInStage}h / {slaLimit}h</span>
+        <div className={`p-2.5 rounded-2xl border ${isOverdue ? 'bg-rose-50/50 border-rose-100/50' : 'bg-slate-50/50 border-slate-100/50'}`}>
+          <div className={`flex items-center gap-2 mb-1 ${isOverdue ? 'text-rose-500' : 'text-slate-400'}`}>
+            <Clock size={13} />
+            <span className="text-[9px] font-black uppercase tracking-wider">Durasi</span>
+          </div>
+          <p className={`text-[11px] font-bold ${isOverdue ? 'text-rose-600' : 'text-slate-700'}`}>
+            {daysInStage}h <span className="text-slate-300 mx-0.5">/</span> {slaLimit}h
+          </p>
         </div>
       </div>
 
-      <div className="flex items-center justify-between pt-3 border-t border-slate-50">
-        <div className="flex -space-x-2">
-           <img src={`https://i.pravatar.cc/150?u=${task.assignedTo}`} alt="Assignee" className="w-6 h-6 rounded-full border-2 border-white" />
+      <div className="flex items-center justify-between pt-4 border-t border-slate-100/50">
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Sangat Aktif</span>
         </div>
-        {canEdit && !isOnHold && (
-          <button 
-            onClick={(e) => {
-              e.stopPropagation();
-              onMoveForward(task.id);
-            }}
-            className={`p-1.5 rounded-lg transition-colors ${isOverdue ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-slate-50 text-slate-600 hover:bg-emerald-50 hover:text-emerald-700'}`}
-            title="Move to Next Stage"
-          >
-            <Sparkles size={14} className={isOverdue ? "animate-pulse" : ""} />
-          </button>
-        )}
+
+        <div className="flex items-center gap-2">
+          {canEdit && (
+            <div className="relative">
+              <button
+                onClick={(e) => { e.stopPropagation(); setShowMenu(!showMenu); }}
+                className="w-9 h-9 flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-900 rounded-xl transition-all"
+              >
+                <MoreVertical size={18} />
+              </button>
+
+              {showMenu && (
+                <div className="absolute right-0 bottom-full mb-2 w-40 glass-panel rounded-2xl shadow-2xl z-50 py-2 border-slate-100 animate-in">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onToggleHold(task.id); setShowMenu(false); }}
+                    className="w-full text-left px-4 py-2.5 text-xs font-black text-slate-600 hover:bg-slate-50 flex items-center gap-3"
+                  >
+                    {isOnHold ? <Play size={16} className="text-emerald-500" /> : <Pause size={16} className="text-amber-500" />}
+                    {isOnHold ? 'Lanjutkan' : 'Hentikan'}
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onDelete(task.id); setShowMenu(false); }}
+                    className="w-full text-left px-4 py-2.5 text-xs font-black text-rose-500 hover:bg-rose-50 flex items-center gap-3"
+                  >
+                    <Trash2 size={16} />
+                    Hapus Data
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {canEdit && !isOnHold && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onMoveForward(task.id);
+              }}
+              className="w-9 h-9 premium-gradient-green text-white rounded-xl shadow-lg shadow-emerald-200 flex items-center justify-center hover:scale-110 active:scale-95 transition-all"
+              title="Pindahkan ke Tahap Berikutnya"
+            >
+              <Sparkles size={16} strokeWidth={2.5} />
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
