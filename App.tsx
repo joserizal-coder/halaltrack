@@ -23,6 +23,7 @@ const App: React.FC = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [users, setUsers] = useState<UserAccount[]>([]);
+  const [isAddingProspek, setIsAddingProspek] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // 1. Fetch Data Awal
@@ -187,13 +188,15 @@ const App: React.FC = () => {
     if (!currentUser) return;
     const formData = new FormData(e.currentTarget);
 
+    const stage = isAddingProspek ? TaskStage.PROSPEK : TaskStage.SUBMITTED;
+
     const { data: newTask, error } = await supabase
       .from('tasks')
       .insert({
         name: formData.get('name') as string,
         company: formData.get('company') as string,
         description: formData.get('description') as string,
-        stage: TaskStage.SUBMITTED,
+        stage: stage,
         assigned_to: currentUser.username
       })
       .select()
@@ -325,6 +328,18 @@ const App: React.FC = () => {
           <div className="bg-white w-full max-w-lg rounded-3xl p-6 shadow-2xl">
             <h2 className="text-xl font-bold mb-4">Pengajuan Baru</h2>
             <form onSubmit={handleAddTask} className="space-y-4">
+              <div className="flex bg-slate-100 p-1 rounded-xl mb-4">
+                <button
+                  type="button"
+                  onClick={() => setIsAddingProspek(false)}
+                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${!isAddingProspek ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500'}`}
+                >Langsung Submit</button>
+                <button
+                  type="button"
+                  onClick={() => setIsAddingProspek(true)}
+                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${isAddingProspek ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500'}`}
+                >Data Prospek</button>
+              </div>
               <input name="name" placeholder="Nama Produk" className="w-full p-3 border rounded-xl bg-slate-50" required />
               <input name="company" placeholder="Perusahaan" className="w-full p-3 border rounded-xl bg-slate-50" required />
               <textarea name="description" placeholder="Deskripsi" className="w-full p-3 border rounded-xl bg-slate-50 h-24"></textarea>

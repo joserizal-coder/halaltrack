@@ -1,4 +1,6 @@
 export enum TaskStage {
+  PROSPEK = 'Prospek',
+  DRAFT = 'Draft',
   SUBMITTED = 'Submitted',
   PRICING = 'Penetapan Harga',
   PRE_AUDIT = 'Pra audit',

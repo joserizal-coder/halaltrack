@@ -92,6 +92,21 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, canEdit, onClose, onUpdateS
                 </div>
               )}
 
+              {/* Prospek/Draft Note */}
+              {slaLimit === 0 && (
+                <div className="bg-slate-50 border border-slate-100 rounded-[2rem] p-6 flex items-start gap-5">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-slate-400 shadow-sm border border-slate-100 shrink-0">
+                    <Clock size={24} />
+                  </div>
+                  <div>
+                    <h4 className="font-black text-slate-900 text-sm uppercase tracking-wide">Tahap Fleksibel</h4>
+                    <p className="text-slate-500 text-sm mt-1 font-semibold leading-relaxed">
+                      Tahapan ini tidak memiliki batasan waktu (SLA). Fokus pada kelengkapan data sebelum dikirim ke tahap selanjutnya.
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* Modern Stepper */}
               <div className="p-8 glass-panel rounded-[2.5rem] overflow-x-auto custom-scrollbar border-white/80">
                 <div className="flex justify-between items-center min-w-[800px] relative px-4">
@@ -110,8 +125,8 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, canEdit, onClose, onUpdateS
                     return (
                       <div key={stage.id} className="flex flex-col items-center z-10 w-24">
                         <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 ${isCompleted ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-200' :
-                            isCurrent ? (isOnHold ? 'bg-slate-600' : isOverdue ? 'bg-rose-500' : 'premium-gradient-blue') + ' text-white scale-125 shadow-2xl shadow-indigo-200' :
-                              'bg-white text-slate-300 border-2 border-slate-50 shadow-sm'
+                          isCurrent ? (isOnHold ? 'bg-slate-600' : isOverdue ? 'bg-rose-500' : 'premium-gradient-blue') + ' text-white scale-125 shadow-2xl shadow-indigo-200' :
+                            'bg-white text-slate-300 border-2 border-slate-50 shadow-sm'
                           }`}>
                           {isCompleted ? <CheckCircle size={22} strokeWidth={2.5} /> : getIcon(stage.icon, 22)}
                         </div>
@@ -233,7 +248,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, canEdit, onClose, onUpdateS
                     <div>
                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Lama Di Tahap Ini</p>
                       <p className={`text-sm font-black ${isOverdue ? 'text-rose-600' : 'text-slate-900'}`}>
-                        {daysInStage} Hari <span className="text-[10px] opacity-40 font-bold">/ Limit {slaLimit}h</span>
+                        {daysInStage} Hari {slaLimit > 0 ? <span className="text-[10px] opacity-40 font-bold">/ Limit {slaLimit}h</span> : <span className="text-[10px] opacity-40 font-bold">(No Limit)</span>}
                       </p>
                     </div>
                   </div>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Task } from '../types';
 import { STAGE_SLA, STAGES } from '../constants';
-import { Eye, ChevronRight, Clock, AlertCircle, Trash2, Pause, Play } from 'lucide-react';
+import { Eye, ChevronRight, Clock, AlertCircle, Trash2, Pause, Play, CheckCircle } from 'lucide-react';
 
 interface TaskTableProps {
   tasks: Task[];
@@ -48,7 +48,12 @@ const TaskTable: React.FC<TaskTableProps> = ({ tasks, canEdit, onOpenDetail, onM
                   </td>
                   <td className="px-6 py-5">
                     <div className="flex items-center gap-2">
-                      {isOverdue ? (
+                      {slaLimit === 0 ? (
+                        <div className="flex items-center gap-1.5 text-slate-400 font-bold text-xs">
+                          <CheckCircle size={14} />
+                          <span>No Limit</span>
+                        </div>
+                      ) : isOverdue ? (
                         <div className="flex items-center gap-1.5 text-red-600 font-bold text-xs">
                           <AlertCircle size={14} />
                           <span>Overdue ({days}d)</span>
@@ -63,7 +68,7 @@ const TaskTable: React.FC<TaskTableProps> = ({ tasks, canEdit, onOpenDetail, onM
                   </td>
                   <td className="px-6 py-5 text-right">
                     <div className="flex items-center justify-end gap-2 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button 
+                      <button
                         onClick={() => onOpenDetail(task)}
                         className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
                         title="Lihat Detail"
@@ -72,21 +77,21 @@ const TaskTable: React.FC<TaskTableProps> = ({ tasks, canEdit, onOpenDetail, onM
                       </button>
                       {canEdit && (
                         <>
-                          <button 
+                          <button
                             onClick={() => onToggleHold(task.id)}
                             className={`p-2 rounded-lg transition-colors ${isOnHold ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}
                             title={isOnHold ? "Lanjutkan" : "Hold"}
                           >
                             {isOnHold ? <Play size={16} /> : <Pause size={16} />}
                           </button>
-                          <button 
+                          <button
                             onClick={() => onMoveForward(task.id)}
                             className="p-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition-colors"
                             title="Lanjut Tahap"
                           >
                             <ChevronRight size={16} />
                           </button>
-                          <button 
+                          <button
                             onClick={() => onDelete(task.id)}
                             className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
                             title="Hapus"
