@@ -28,7 +28,7 @@ const App: React.FC = () => {
   useEffect(() => {
     const initApp = async () => {
       setLoading(true);
-      
+
       // Check Auth
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
@@ -37,7 +37,7 @@ const App: React.FC = () => {
           .select('*')
           .eq('id', session.user.id)
           .single();
-        
+
         if (profile) {
           setCurrentUser({
             id: session.user.id,
@@ -57,6 +57,10 @@ const App: React.FC = () => {
       if (tasksData) {
         const formattedTasks = tasksData.map((t: any) => ({
           ...t,
+          createdAt: t.created_at,
+          stageUpdatedAt: t.stage_updated_at,
+          assignedTo: t.assigned_to,
+          aiAnalysis: t.ai_analysis,
           checklist: formatChecklistFromDB(t.checklists)
         }));
         setTasks(formattedTasks);
@@ -68,7 +72,7 @@ const App: React.FC = () => {
         .select('*')
         .eq('key', 'sla_config')
         .single();
-      
+
       if (settingsData) setSlaSettings(settingsData.value);
 
       setLoading(false);
@@ -121,7 +125,7 @@ const App: React.FC = () => {
     const task = tasks.find(t => t.id === taskId);
     if (!task) return;
     const newStatus = task.status === 'On Hold' ? 'Active' : 'On Hold';
-    
+
     await supabase.from('tasks').update({ status: newStatus }).eq('id', taskId);
     setTasks(prev => prev.map(t => t.id === taskId ? { ...t, status: newStatus as any } : t));
   };
@@ -129,7 +133,7 @@ const App: React.FC = () => {
   const handleToggleChecklist = async (taskId: string, stage: TaskStage, itemId: string) => {
     const task = tasks.find(t => t.id === taskId);
     if (!task) return;
-    
+
     const item = task.checklist[stage].find(i => i.id === itemId);
     if (!item) return;
 
@@ -152,7 +156,7 @@ const App: React.FC = () => {
     e.preventDefault();
     if (!currentUser) return;
     const formData = new FormData(e.currentTarget);
-    
+
     const { data: newTask, error } = await supabase
       .from('tasks')
       .insert({
@@ -180,8 +184,8 @@ const App: React.FC = () => {
 
   const filteredTasks = useMemo(() => {
     const lower = searchQuery.toLowerCase();
-    return tasks.filter(t => 
-      t.name.toLowerCase().includes(lower) || 
+    return tasks.filter(t =>
+      t.name.toLowerCase().includes(lower) ||
       t.company.toLowerCase().includes(lower)
     );
   }, [tasks, searchQuery]);
@@ -189,10 +193,10 @@ const App: React.FC = () => {
   if (loading) return <div className="h-screen flex items-center justify-center bg-slate-50 font-bold text-slate-400 animate-pulse">Memuat Data LPH...</div>;
 
   return (
-    <Layout 
+    <Layout
       activeView={activeView}
       currentUser={currentUser}
-      onSearch={setSearchQuery} 
+      onSearch={setSearchQuery}
       onAddNew={() => setIsAddModalOpen(true)}
       onToggleNotifications={() => setShowNotifications(!showNotifications)}
       onNavigate={setActiveView}
@@ -200,17 +204,17 @@ const App: React.FC = () => {
       onLogout={handleLogout}
     >
       {activeView === 'dashboard' && (
-        <KanbanBoard 
-          tasks={filteredTasks} 
-          onMoveForward={(id) => handleUpdateStage(id, STAGES[STAGES.findIndex(s => s.id === tasks.find(t => t.id === id)?.stage) + 1]?.id as TaskStage)} 
+        <KanbanBoard
+          tasks={filteredTasks}
+          onMoveForward={(id) => handleUpdateStage(id, STAGES[STAGES.findIndex(s => s.id === tasks.find(t => t.id === id)?.stage) + 1]?.id as TaskStage)}
           onOpenDetail={setSelectedTask}
-          onDelete={async (id) => { if(confirm('Hapus?')) { await supabase.from('tasks').delete().eq('id', id); setTasks(t => t.filter(x => x.id !== id)); } }}
+          onDelete={async (id) => { if (confirm('Hapus?')) { await supabase.from('tasks').delete().eq('id', id); setTasks(t => t.filter(x => x.id !== id)); } }}
           onToggleHold={handleToggleHold}
           canEdit={!!currentUser}
         />
       )}
       {/* View lainnya tetap menggunakan logic serupa yang telah di-refactor */}
-      
+
       {isAddModalOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md">
           <div className="bg-white w-full max-w-lg rounded-3xl p-6 shadow-2xl">
@@ -231,10 +235,10 @@ const App: React.FC = () => {
       )}
 
       {selectedTask && (
-        <TaskModal 
-          task={selectedTask} 
+        <TaskModal
+          task={selectedTask}
           canEdit={!!currentUser}
-          onClose={() => setSelectedTask(null)} 
+          onClose={() => setSelectedTask(null)}
           onUpdateStage={handleUpdateStage}
           onToggleHold={handleToggleHold}
           onToggleChecklist={handleToggleChecklist}
