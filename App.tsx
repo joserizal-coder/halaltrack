@@ -344,7 +344,7 @@ const App: React.FC = () => {
               <input name="company" placeholder="Perusahaan" className="w-full p-3 border rounded-xl bg-slate-50" required />
               <textarea name="description" placeholder="Deskripsi" className="w-full p-3 border rounded-xl bg-slate-50 h-24"></textarea>
               <button type="submit" className="w-full py-3 bg-emerald-600 text-white font-bold rounded-xl">Simpan ke Cloud</button>
-              <button type="button" onClick={() => setIsAddModalOpen(false)} className="w-full py-3 text-slate-400 font-bold">Batal</button>
+              <button type="button" onClick={() => { setIsAddModalOpen(false); setIsAddingProspek(false); }} className="w-full py-3 text-slate-400 font-bold">Batal</button>
             </form>
           </div>
         </div>
