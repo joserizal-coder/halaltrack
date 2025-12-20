@@ -30,7 +30,7 @@ const Layout: React.FC<LayoutProps> = ({
   onLogout
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
-  const isAdmin = currentUser?.role === 'Admin';
+  const isAdmin = currentUser?.role === 'superadmin' || currentUser?.role === 'admin';
   const isLoggedIn = !!currentUser;
 
   return (

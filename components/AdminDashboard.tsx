@@ -5,25 +5,32 @@ import { UserPlus, Shield, User, Trash2, Key, CheckCircle2 } from 'lucide-react'
 
 interface AdminDashboardProps {
   users: UserAccount[];
-  onAddUser: (user: Partial<UserAccount>) => void;
+  onAddUser: (user: Partial<UserAccount>) => Promise<boolean>;
   onDeleteUser: (userId: string) => void;
 }
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ users, onAddUser, onDeleteUser }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState<'Admin' | 'Auditor' | 'Reviewer'>('Auditor');
+  const [role, setRole] = useState<'superadmin' | 'admin'>('admin');
   const [successMsg, setSuccessMsg] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username || !password) return;
-    
-    onAddUser({ username, password, role });
-    setUsername('');
-    setPassword('');
-    setSuccessMsg('User berhasil ditambahkan!');
-    setTimeout(() => setSuccessMsg(''), 3000);
+    if (!username || !password || loading) return;
+
+    setLoading(true);
+    const success = await onAddUser({ username, password, role });
+    setLoading(false);
+
+    if (success) {
+      setUsername('');
+      setPassword('');
+      setSuccessMsg('User berhasil ditambahkan!');
+      setTimeout(() => setSuccessMsg(''), 3000);
+    }
   };
 
   return (
@@ -43,11 +50,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ users, onAddUser, onDel
               <label className="text-xs font-black text-slate-400 uppercase mb-1 block">Username</label>
               <div className="relative">
                 <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Masukkan username" 
+                  placeholder="Masukkan username"
                   className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                 />
               </div>
@@ -57,11 +64,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ users, onAddUser, onDel
               <label className="text-xs font-black text-slate-400 uppercase mb-1 block">Password</label>
               <div className="relative">
                 <Key size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input 
-                  type="password" 
+                <input
+                  type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••" 
+                  placeholder="••••••••"
                   className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                 />
               </div>
@@ -69,20 +76,27 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ users, onAddUser, onDel
 
             <div>
               <label className="text-xs font-black text-slate-400 uppercase mb-1 block">Role</label>
-              <select 
+              <select
                 value={role}
                 onChange={(e) => setRole(e.target.value as any)}
                 className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               >
-                <option value="Admin">Admin</option>
-                <option value="Auditor">Auditor</option>
-                <option value="Reviewer">Reviewer</option>
+                <option value="admin">Admin</option>
+                <option value="superadmin">Superadmin</option>
               </select>
             </div>
 
-            <button type="submit" className="w-full py-3 bg-blue-600 text-white font-bold rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all flex items-center justify-center gap-2">
-              <UserPlus size={18} />
-              Simpan User
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 bg-blue-600 disabled:bg-blue-400 text-white font-bold rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+              ) : (
+                <UserPlus size={18} />
+              )}
+              {loading ? 'Memproses...' : 'Simpan User'}
             </button>
 
             {successMsg && (
@@ -124,10 +138,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ users, onAddUser, onDel
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${
-                        user.role === 'Admin' ? 'bg-purple-50 text-purple-600' :
-                        user.role === 'Auditor' ? 'bg-blue-50 text-blue-600' : 'bg-emerald-50 text-emerald-600'
-                      }`}>
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${user.role === 'superadmin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'
+                        }`}>
                         {user.role}
                       </span>
                     </td>
@@ -135,7 +147,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ users, onAddUser, onDel
                       <span className="text-xs text-slate-500">{new Date(user.createdAt).toLocaleDateString()}</span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button 
+                      <button
                         onClick={() => onDeleteUser(user.id)}
                         className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
                       >

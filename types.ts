@@ -44,6 +44,6 @@ export interface UserAccount {
   id: string;
   username: string;
   password?: string;
-  role: 'Admin' | 'Auditor' | 'Reviewer';
+  role: 'superadmin' | 'admin';
   createdAt: string;
 }

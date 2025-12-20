@@ -179,8 +179,67 @@ const App: React.FC = () => {
     }
   };
 
-  const handleAddUser = async (user: Partial<UserAccount>) => {
-    alert('Fungsi tambah user hanya tersedia di Dashboard Supabase Auth untuk alasan keamanan.');
+  const handleAddUser = async (user: Partial<UserAccount>): Promise<boolean> => {
+    if (!user.username || !user.password || !user.role) {
+      alert('Mohon isi semua data user.');
+      return false;
+    }
+
+    // Supabase Auth butuh email, kita buat dummy email dari username
+    const email = `${user.username}@halaltrack.com`;
+
+    try {
+      const { data, error: authError } = await supabase.auth.signUp({
+        email,
+        password: user.password as string,
+        options: {
+          data: {
+            username: user.username,
+            role: user.role
+          }
+        }
+      });
+
+      if (authError) {
+        if (authError.message.includes('already registered')) {
+          alert(`Gagal: Username "${user.username}" sudah digunakan.`);
+        } else {
+          alert(`Gagal menambah user: ${authError.message}`);
+        }
+        return false;
+      }
+
+      if (data.user) {
+        // Update profile dengan username dan role yang benar
+        // Supabase biasanya otomatis buat profile via trigger, tapi kalau tidak kita masukkan manual
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .upsert({
+            id: data.user.id,
+            username: user.username,
+            role: user.role,
+            created_at: new Date().toISOString()
+          });
+
+        if (profileError) {
+          console.error('Gagal update profile:', profileError);
+        }
+
+        setUsers(prev => [{
+          id: data.user!.id,
+          username: user.username!,
+          role: user.role as any,
+          createdAt: new Date().toISOString()
+        }, ...prev]);
+
+        alert('User berhasil ditambahkan!\n\nCatatan: Jika Email Confirmation aktif di Supabase, user perlu konfirmasi email (dummy) atau Anda harus mematikan fitur konfirmasi di Dashboard Supabase.');
+        return true;
+      }
+    } catch (err) {
+      console.error('Unexpected error during user creation:', err);
+      alert('Terjadi kesalahan tidak terduga saat menambah user.');
+    }
+    return false;
   };
 
   const handleAddTask = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -308,7 +367,7 @@ const App: React.FC = () => {
           <SettingsDashboard
             slaSettings={slaSettings}
             onUpdateSla={handleUpdateSla}
-            isAdmin={currentUser?.role === 'Admin'}
+            isAdmin={currentUser?.role === 'superadmin' || currentUser?.role === 'admin'}
           />
         </div>
       )}
