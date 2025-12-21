@@ -96,21 +96,23 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, canEdit, onClose, onUpdateS
               ) : (
                 <>
                   <h2 className="text-3xl font-black text-slate-900 leading-tight">{task.name}</h2>
-                  <div className="flex flex-wrap items-center gap-4 mt-2">
-                    <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">{task.company}</p>
-                    {(task.whatsapp || task.address) && <div className="h-4 w-[1px] bg-slate-200"></div>}
-                    {task.whatsapp && (
-                      <a
-                        href={`https://wa.me/${task.whatsapp.replace(/\D/g, '')}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-1.5 text-emerald-600 hover:text-emerald-700 font-black text-xs uppercase tracking-widest transition-colors"
-                      >
-                        <MessageSquare size={14} />
-                        Hubungi WA
-                      </a>
-                    )}
-                  </div>
+                  {canEdit && (
+                    <div className="flex flex-wrap items-center gap-4 mt-2">
+                      <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">{task.company}</p>
+                      {(task.whatsapp || task.address) && <div className="h-4 w-[1px] bg-slate-200"></div>}
+                      {task.whatsapp && (
+                        <a
+                          href={`https://wa.me/${task.whatsapp.replace(/\D/g, '')}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1.5 text-emerald-600 hover:text-emerald-700 font-black text-xs uppercase tracking-widest transition-colors"
+                        >
+                          <MessageSquare size={14} />
+                          Hubungi WA
+                        </a>
+                      )}
+                    </div>
+                  )}
                 </>
               )}
             </div>
