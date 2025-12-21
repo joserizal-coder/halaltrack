@@ -90,7 +90,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, canEdit, onClose, onUpdateS
                     value={editForm.company}
                     onChange={e => setEditForm({ ...editForm, company: e.target.value })}
                     className="text-sm font-bold text-slate-500 w-full bg-slate-50 border-b-2 border-slate-200 focus:border-emerald-500 focus:outline-none px-2 py-1"
-                    placeholder="Nama Perusahaan"
+                    placeholder="Nama Perusahaan/ Pemilik"
                   />
                 </div>
               ) : (

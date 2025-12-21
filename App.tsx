@@ -558,13 +558,13 @@ const App: React.FC = () => {
                 >Data Prospek</button>
               </div>
               <input name="name" placeholder="Nama Produk" className="w-full p-3 border rounded-xl bg-slate-50" required />
-              <input name="company" placeholder="Perusahaan" className="w-full p-3 border rounded-xl bg-slate-50" required />
+              <input name="company" placeholder="Nama Perusahaan/ Pemilik" className="w-full p-3 border rounded-xl bg-slate-50" required />
               <div className="grid grid-cols-2 gap-4">
                 <input name="whatsapp" placeholder="Nomor WhatsApp" className="w-full p-3 border rounded-xl bg-slate-50" />
                 <input name="address" placeholder="Alamat Pelaku Usaha" className="w-full p-3 border rounded-xl bg-slate-50" />
               </div>
               <textarea name="description" placeholder="Deskripsi Singkat" className="w-full p-3 border rounded-xl bg-slate-50 h-24"></textarea>
-              <button type="submit" className="w-full py-3 bg-emerald-600 text-white font-bold rounded-xl">Simpan ke Cloud</button>
+              <button type="submit" className="w-full py-3 bg-emerald-600 text-white font-bold rounded-xl">Bismillah Simpan</button>
               <button type="button" onClick={() => { setIsAddModalOpen(false); setIsAddingProspek(false); }} className="w-full py-3 text-slate-400 font-bold">Batal</button>
             </form>
           </div>
