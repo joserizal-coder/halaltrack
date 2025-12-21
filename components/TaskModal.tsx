@@ -275,48 +275,61 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, canEdit, onClose, onUpdateS
               </div>
 
               {/* Interaction Tabs */}
-              <div className="space-y-6">
-                <div className="flex bg-white/50 p-1.5 rounded-[1.5rem] border border-slate-200/60 w-fit">
-                  <button
-                    onClick={() => setShowDocs(false)}
-                    className={`px-8 py-3 text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl transition-all duration-300 ${!showDocs ? 'bg-slate-900 text-white shadow-xl' : 'text-slate-400 hover:text-slate-600'}`}
-                  >
-                    Detail Deskripsi
-                  </button>
-                  <button
-                    onClick={() => setShowDocs(true)}
-                    className={`px-8 py-3 text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl transition-all duration-300 ${showDocs ? 'bg-slate-900 text-white shadow-xl' : 'text-slate-400 hover:text-slate-600'}`}
-                  >
-                    Checklist Dokumen
-                  </button>
-                </div>
+              {canEdit ? (
+                <div className="space-y-6">
+                  <div className="flex bg-white/50 p-1.5 rounded-[1.5rem] border border-slate-200/60 w-fit">
+                    <button
+                      onClick={() => setShowDocs(false)}
+                      className={`px-8 py-3 text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl transition-all duration-300 ${!showDocs ? 'bg-slate-900 text-white shadow-xl' : 'text-slate-400 hover:text-slate-600'}`}
+                    >
+                      Detail Deskripsi
+                    </button>
+                    <button
+                      onClick={() => setShowDocs(true)}
+                      className={`px-8 py-3 text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl transition-all duration-300 ${showDocs ? 'bg-slate-900 text-white shadow-xl' : 'text-slate-400 hover:text-slate-600'}`}
+                    >
+                      Checklist Dokumen
+                    </button>
+                  </div>
 
-                <div className="min-h-[200px]">
-                  {!showDocs ? (
-                    <div className="p-8 bg-white/50 border border-white rounded-[2rem] shadow-sm text-slate-600 leading-relaxed font-medium animate-in fade-in slide-in-from-left-4">
-                      <p className="first-letter:text-4xl first-letter:font-black first-letter:text-emerald-600 first-letter:mr-1 first-letter:float-left">{task.description}</p>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-right-4">
-                      {currentChecklist.map((item, idx) => (
-                        <button
-                          key={item.id}
-                          style={{ animationDelay: `${idx * 50}ms` }}
-                          onClick={() => canEdit && onToggleChecklist(task.id, task.stage, item.id)}
-                          className={`flex items-center gap-4 p-5 bg-white/80 backdrop-blur-sm rounded-3xl border transition-all text-left shadow-sm group animate-in slide-in-from-bottom-2 ${canEdit ? 'border-transparent hover:border-emerald-500 hover:shadow-emerald-100 hover:translate-y-[-2px]' : 'border-slate-50 cursor-default'} ${item.completed ? 'bg-emerald-50/30' : ''}`}
-                        >
-                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${item.completed ? 'bg-emerald-500 text-white' : 'bg-slate-50 text-slate-300 group-hover:bg-emerald-50 group-hover:text-emerald-400'}`}>
-                            {item.completed ? <CheckSquare size={20} strokeWidth={2.5} /> : <Square size={20} />}
-                          </div>
-                          <span className={`text-[13px] font-bold ${item.completed ? 'text-slate-400 line-through' : 'text-slate-700'}`}>
-                            {item.label}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                  <div className="bg-white p-8 md:p-10 rounded-[2.5rem] border border-slate-100/80 shadow-sm min-h-[300px]">
+                    {!showDocs ? (
+                      <div className="animate-in fade-in slide-in-from-left-4">
+                        <h4 className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-6">Deskripsi Lengkap</h4>
+                        <p className="first-letter:text-4xl first-letter:font-black first-letter:text-emerald-600 first-letter:mr-1 first-letter:float-left">{task.description}</p>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-right-4">
+                        {currentChecklist.map((item, idx) => (
+                          <button
+                            key={item.id}
+                            style={{ animationDelay: `${idx * 50}ms` }}
+                            onClick={() => canEdit && onToggleChecklist(task.id, task.stage, item.id)}
+                            className={`flex items-center gap-4 p-5 bg-white/80 backdrop-blur-sm rounded-3xl border transition-all text-left shadow-sm group animate-in slide-in-from-bottom-2 ${canEdit ? 'border-transparent hover:border-emerald-500 hover:shadow-emerald-100 hover:translate-y-[-2px]' : 'border-slate-50 cursor-default'} ${item.completed ? 'bg-emerald-50/30' : ''}`}
+                          >
+                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${item.completed ? 'bg-emerald-500 text-white' : 'bg-slate-50 text-slate-300 group-hover:bg-emerald-50 group-hover:text-emerald-400'}`}>
+                              {item.completed ? <CheckSquare size={20} strokeWidth={2.5} /> : <Square size={20} />}
+                            </div>
+                            <span className={`text-[13px] font-bold ${item.completed ? 'text-slate-400 line-through' : 'text-slate-700'}`}>
+                              {item.label}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="p-8 md:p-10 glass-panel rounded-[2.5rem] bg-slate-50/50 border-white/80 flex flex-col items-center justify-center text-center min-h-[200px]">
+                  <div className="w-16 h-16 rounded-3xl bg-slate-100 flex items-center justify-center mb-4 text-slate-400">
+                    <User size={32} />
+                  </div>
+                  <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-2">Akses Terbatas</h3>
+                  <p className="text-xs text-slate-500 font-medium max-w-xs leading-relaxed">
+                    Detail deskripsi dan dokumen hanya dapat diakses oleh Admin dan User terdaftar.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Sidebar Meta Info */}

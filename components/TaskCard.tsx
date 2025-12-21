@@ -50,7 +50,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, canEdit, onMoveForward, onOpe
 
       <div className="mb-2">
         <h4 className="font-black text-slate-900 text-sm mb-0.5 leading-tight group-hover:text-emerald-600 transition-colors">{task.name}</h4>
-        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{task.company}</p>
+        {canEdit && <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{task.company}</p>}
       </div>
 
       <div className="grid grid-cols-2 gap-2 mb-3">
