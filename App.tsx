@@ -18,7 +18,9 @@ const App: React.FC = () => {
   const [slaSettings, setSlaSettings] = useState<Record<TaskStage, number>>(INITIAL_SLA);
   const [activeView, setActiveView] = useState<'dashboard' | 'tasks' | 'admin' | 'settings'>('dashboard');
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+
   const [searchQuery, setSearchQuery] = useState('');
+  const [filterStage, setFilterStage] = useState<TaskStage | 'All'>('All');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -417,11 +419,12 @@ const App: React.FC = () => {
 
   const filteredTasks = useMemo(() => {
     const lower = searchQuery.toLowerCase();
-    return tasks.filter(t =>
-      t.name.toLowerCase().includes(lower) ||
-      t.company.toLowerCase().includes(lower)
-    );
-  }, [tasks, searchQuery]);
+    return tasks.filter(t => {
+      const matchesSearch = t.name.toLowerCase().includes(lower) || t.company.toLowerCase().includes(lower);
+      const matchesStage = filterStage === 'All' || t.stage === filterStage;
+      return matchesSearch && matchesStage;
+    });
+  }, [tasks, searchQuery, filterStage]);
 
   const overdueTasks = useMemo(() => {
     return tasks.filter(t => {
@@ -464,8 +467,20 @@ const App: React.FC = () => {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-black text-slate-800">Task</h2>
-            <div className="px-4 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-xs font-bold border border-emerald-100 italic">
-              Menampilkan {filteredTasks.length} pengajuan aktif
+            <div className="flex items-center gap-4">
+              <select
+                value={filterStage}
+                onChange={(e) => setFilterStage(e.target.value as TaskStage | 'All')}
+                className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-600 focus:outline-none focus:border-emerald-500"
+              >
+                <option value="All">Semua Tahap</option>
+                {STAGES.map(s => (
+                  <option key={s.id} value={s.id}>{s.label}</option>
+                ))}
+              </select>
+              <div className="px-4 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-xs font-bold border border-emerald-100 italic">
+                Menampilkan {filteredTasks.length} pengajuan aktif
+              </div>
             </div>
           </div>
           <TaskTable

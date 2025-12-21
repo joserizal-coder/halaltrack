@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { X, MessageSquare, AlertTriangle, Clock, Calendar, User, Sparkles, Loader2, CheckCircle, FileText, ChevronRight, Pause, Play, CheckSquare, Square, Edit2, Save } from 'lucide-react';
+import { X, MessageSquare, AlertTriangle, Clock, Calendar, User, CheckCircle, FileText, ChevronRight, Pause, Play, CheckSquare, Square, Edit2, Save } from 'lucide-react';
 import { Task, TaskStage } from '../types';
 import { STAGES, getIcon, STAGE_SLA } from '../constants';
-import { analyzeTask } from '../services/geminiService';
 
 interface TaskModalProps {
   task: Task | null;
@@ -15,8 +14,6 @@ interface TaskModalProps {
 }
 
 const TaskModal: React.FC<TaskModalProps> = ({ task, canEdit, onClose, onUpdateStage, onUpdateTask, onToggleHold, onToggleChecklist }) => {
-  const [aiInsight, setAiInsight] = useState<string | null>(null);
-  const [loadingAi, setLoadingAi] = useState(false);
   const [showDocs, setShowDocs] = useState(false);
 
   // Edit State
@@ -31,7 +28,6 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, canEdit, onClose, onUpdateS
 
   useEffect(() => {
     if (task) {
-      setAiInsight(task.aiAnalysis || null);
       setShowDocs(false);
       setEditForm({
         name: task.name,
@@ -41,8 +37,6 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, canEdit, onClose, onUpdateS
         description: task.description
       });
       setIsEditing(false);
-    } else {
-      setAiInsight(null);
     }
   }, [task]);
 
@@ -62,12 +56,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, canEdit, onClose, onUpdateS
   const isOverdue = slaLimit > 0 && daysInStage >= slaLimit && task.status !== 'On Hold';
   const isOnHold = task.status === 'On Hold';
 
-  const handleRunAi = async () => {
-    setLoadingAi(true);
-    const result = await analyzeTask(task.name, task.description, task.stage);
-    setAiInsight(result);
-    setLoadingAi(false);
-  };
+
 
   const currentChecklist = task.checklist[task.stage] || [];
 
@@ -188,66 +177,68 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, canEdit, onClose, onUpdateS
               )}
 
               {/* Detail Pelaku Usaha */}
-              <div className="p-8 md:p-10 glass-panel rounded-[2.5rem] bg-white border-white/80">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                    <FileText size={18} />
+              {canEdit && (
+                <div className="p-8 md:p-10 glass-panel rounded-[2.5rem] bg-white border-white/80">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                      <FileText size={18} />
+                    </div>
+                    <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">Detail Pelaku Usaha</h3>
                   </div>
-                  <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">Detail Pelaku Usaha</h3>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <div>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">Alamat Perusahaan</p>
+                      {isEditing ? (
+                        <textarea
+                          value={editForm.address}
+                          onChange={e => setEditForm({ ...editForm, address: e.target.value })}
+                          className="w-full h-24 p-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-emerald-500 focus:outline-none text-sm font-medium"
+                          placeholder="Alamat lengkap..."
+                        />
+                      ) : (
+                        <p className="text-sm font-bold text-slate-700 leading-relaxed bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                          {task.address || 'Alamat belum diatur'}
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">Informasi Kontak</p>
+                      {isEditing ? (
+                        <input
+                          value={editForm.whatsapp}
+                          onChange={e => setEditForm({ ...editForm, whatsapp: e.target.value })}
+                          className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-emerald-500 focus:outline-none text-sm font-medium"
+                          placeholder="0812..."
+                        />
+                      ) : (
+                        <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center justify-between">
+                          <span className="text-sm font-bold text-slate-700">{task.whatsapp || 'No. WA belum diatur'}</span>
+                          {task.whatsapp && (
+                            <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                              <MessageSquare size={16} />
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
                   <div>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">Alamat Perusahaan</p>
+                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-3">Deskripsi Singkat</h4>
                     {isEditing ? (
                       <textarea
-                        value={editForm.address}
-                        onChange={e => setEditForm({ ...editForm, address: e.target.value })}
-                        className="w-full h-24 p-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-emerald-500 focus:outline-none text-sm font-medium"
-                        placeholder="Alamat lengkap..."
+                        value={editForm.description}
+                        onChange={e => setEditForm({ ...editForm, description: e.target.value })}
+                        className="w-full h-32 p-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-emerald-500 focus:outline-none text-sm font-medium"
+                        placeholder="Deskripsi produk/usaha..."
                       />
                     ) : (
-                      <p className="text-sm font-bold text-slate-700 leading-relaxed bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                        {task.address || 'Alamat belum diatur'}
+                      <p className="text-slate-600 text-[15px] font-medium leading-relaxed">
+                        {task.description || 'Tidak ada deskripsi tambahan.'}
                       </p>
                     )}
                   </div>
-                  <div>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">Informasi Kontak</p>
-                    {isEditing ? (
-                      <input
-                        value={editForm.whatsapp}
-                        onChange={e => setEditForm({ ...editForm, whatsapp: e.target.value })}
-                        className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-emerald-500 focus:outline-none text-sm font-medium"
-                        placeholder="0812..."
-                      />
-                    ) : (
-                      <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center justify-between">
-                        <span className="text-sm font-bold text-slate-700">{task.whatsapp || 'No. WA belum diatur'}</span>
-                        {task.whatsapp && (
-                          <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
-                            <MessageSquare size={16} />
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
                 </div>
-                <div>
-                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-3">Deskripsi Singkat</h4>
-                  {isEditing ? (
-                    <textarea
-                      value={editForm.description}
-                      onChange={e => setEditForm({ ...editForm, description: e.target.value })}
-                      className="w-full h-32 p-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-emerald-500 focus:outline-none text-sm font-medium"
-                      placeholder="Deskripsi produk/usaha..."
-                    />
-                  ) : (
-                    <p className="text-slate-600 text-[15px] font-medium leading-relaxed">
-                      {task.description || 'Tidak ada deskripsi tambahan.'}
-                    </p>
-                  )}
-                </div>
-              </div>
+              )}
 
               {/* Modern Stepper */}
               <div className="p-8 glass-panel rounded-[2.5rem] overflow-x-auto custom-scrollbar border-white/80">
@@ -328,45 +319,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, canEdit, onClose, onUpdateS
 
             {/* Sidebar Meta Info */}
             <div className="lg:col-span-4 space-y-8">
-              {/* AI Insight Card */}
-              <div className="premium-gradient-blue rounded-[2.5rem] p-8 text-white shadow-2xl shadow-indigo-200 relative overflow-hidden group">
-                <div className="absolute top-[-20%] right-[-10%] w-64 h-64 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-1000"></div>
 
-                <div className="flex items-center justify-between mb-8 relative z-10">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center">
-                      <Sparkles size={20} className="animate-pulse" />
-                    </div>
-                    <span className="text-[11px] font-black uppercase tracking-[0.2em]">AI Intelligence</span>
-                  </div>
-                  {canEdit && (
-                    <button
-                      onClick={handleRunAi}
-                      disabled={loadingAi}
-                      className="p-2 bg-white/20 hover:bg-white/40 rounded-xl transition-all disabled:opacity-50"
-                    >
-                      {loadingAi ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
-                    </button>
-                  )}
-                </div>
-
-                <div className="relative z-10 min-h-[140px]">
-                  {aiInsight ? (
-                    <div className="text-[13px] font-semibold leading-relaxed opacity-90 prose prose-invert max-w-none">
-                      {aiInsight}
-                    </div>
-                  ) : loadingAi ? (
-                    <div className="flex flex-col items-center justify-center py-6">
-                      <Loader2 size={32} className="animate-spin mb-4" />
-                      <p className="text-[11px] font-black uppercase tracking-widest animate-pulse">Meninjau Berkas...</p>
-                    </div>
-                  ) : (
-                    <div className="text-center py-6 opacity-60">
-                      <p className="text-[12px] font-bold italic">Klik tombol kilat di atas untuk analisis AI cerdas terhadap pengajuan ini.</p>
-                    </div>
-                  )}
-                </div>
-              </div>
 
               {/* Status Meta */}
               <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">

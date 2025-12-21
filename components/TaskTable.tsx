@@ -20,6 +20,12 @@ const TaskTable: React.FC<TaskTableProps> = ({ tasks, canEdit, onOpenDetail, onM
           <thead>
             <tr className="bg-slate-50/50 border-b border-slate-100">
               <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Produk & Perusahaan</th>
+              {canEdit && (
+                <>
+                  <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">WhatsApp</th>
+                  <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Alamat</th>
+                </>
+              )}
               <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Tahap Saat Ini</th>
               <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">SLA Status</th>
               <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Aksi</th>
@@ -41,6 +47,25 @@ const TaskTable: React.FC<TaskTableProps> = ({ tasks, canEdit, onOpenDetail, onM
                       {canEdit && <p className="text-xs text-slate-500">{task.company}</p>}
                     </div>
                   </td>
+                  {canEdit && (
+                    <>
+                      <td className="px-6 py-5">
+                        {task.whatsapp ? (
+                          <a
+                            href={`https://wa.me/${task.whatsapp.replace(/\D/g, '')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-emerald-600 font-bold text-xs hover:underline decoration-emerald-500 underline-offset-2"
+                          >
+                            {task.whatsapp}
+                          </a>
+                        ) : <span className="text-slate-300 text-xs italic">N/A</span>}
+                      </td>
+                      <td className="px-6 py-5">
+                        <span className="text-slate-500 text-xs font-medium line-clamp-2 max-w-[150px]" title={task.address}>{task.address || '-'}</span>
+                      </td>
+                    </>
+                  )}
                   <td className="px-6 py-5">
                     <span className="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-[10px] font-bold uppercase border border-slate-200">
                       {task.stage}
