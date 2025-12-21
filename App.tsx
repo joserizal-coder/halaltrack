@@ -105,6 +105,7 @@ const App: React.FC = () => {
             stageUpdatedAt: t.stage_updated_at,
             assignedTo: t.assigned_to,
             aiAnalysis: t.ai_analysis,
+            reviewExtensionUsed: t.review_extension_used,
             checklist: formatChecklistFromDB(t.checklists)
           }));
           setTasks(formattedTasks);
@@ -262,6 +263,27 @@ const App: React.FC = () => {
       }
       return t;
     }));
+  };
+
+  const handleRequestExtension = async (taskId: string) => {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+
+    const { error } = await supabase
+      .from('tasks')
+      .update({ review_extension_used: true })
+      .eq('id', taskId);
+
+    if (!error) {
+      setTasks(prev => prev.map(t => t.id === taskId ? { ...t, reviewExtensionUsed: true } : t));
+      if (selectedTask?.id === taskId) {
+        setSelectedTask(prev => prev ? { ...prev, reviewExtensionUsed: true } : null);
+      }
+      alert('Perpanjangan waktu 5 hari berhasil diaktifkan.');
+    } else {
+      alert('Gagal mengaktifkan perpanjangan waktu.');
+      console.error(error);
+    }
   };
 
   const handleSaveSla = async (newSettings: Record<TaskStage, number>) => {
@@ -428,7 +450,10 @@ const App: React.FC = () => {
 
   const overdueTasks = useMemo(() => {
     return tasks.filter(t => {
-      const slaLimit = slaSettings[t.stage] || 0;
+      let slaLimit = slaSettings[t.stage] || 0;
+      if (t.stage === TaskStage.REVIEW && t.reviewExtensionUsed) {
+        slaLimit += 5;
+      }
       if (slaLimit === 0) return false;
       const days = Math.floor((Date.now() - new Date(t.stageUpdatedAt).getTime()) / (1000 * 60 * 60 * 24));
       return days >= slaLimit && t.status !== 'On Hold';
@@ -584,6 +609,7 @@ const App: React.FC = () => {
           onUpdateTask={handleUpdateTask}
           onToggleHold={handleToggleHold}
           onToggleChecklist={handleToggleChecklist}
+          onRequestExtension={handleRequestExtension}
         />
       )}
     </Layout>

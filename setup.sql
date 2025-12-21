@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS public.tasks (
   assigned_to TEXT,
   whatsapp TEXT,
   address TEXT,
+  review_extension_used BOOLEAN DEFAULT FALSE,
   ai_analysis TEXT,
   stage_updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()

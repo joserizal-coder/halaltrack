@@ -11,9 +11,10 @@ interface TaskModalProps {
   onUpdateTask: (taskId: string, updates: Partial<Task>) => Promise<boolean>;
   onToggleHold: (taskId: string) => void;
   onToggleChecklist: (taskId: string, stage: TaskStage, itemId: string) => void;
+  onRequestExtension: (taskId: string) => void;
 }
 
-const TaskModal: React.FC<TaskModalProps> = ({ task, canEdit, onClose, onUpdateStage, onUpdateTask, onToggleHold, onToggleChecklist }) => {
+const TaskModal: React.FC<TaskModalProps> = ({ task, canEdit, onClose, onUpdateStage, onUpdateTask, onToggleHold, onToggleChecklist, onRequestExtension }) => {
   const [showDocs, setShowDocs] = useState(false);
 
   // Edit State
@@ -51,7 +52,8 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, canEdit, onClose, onUpdateS
   const currentStageIndex = STAGES.findIndex(s => s.id === task.stage);
   const updatedAt = new Date(task.stageUpdatedAt).getTime();
   const daysInStage = Math.floor((Date.now() - updatedAt) / (1000 * 60 * 60 * 24));
-  const slaLimit = STAGE_SLA[task.stage] || 0;
+  let slaLimit = STAGE_SLA[task.stage] || 0;
+  if (task.stage === TaskStage.REVIEW && task.reviewExtensionUsed) slaLimit += 5;
   // Jika slaLimit adalah 0, maka tidak akan pernah dianggap overdue
   const isOverdue = slaLimit > 0 && daysInStage >= slaLimit && task.status !== 'On Hold';
   const isOnHold = task.status === 'On Hold';
@@ -402,6 +404,14 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, canEdit, onClose, onUpdateS
                   >
                     {isOnHold ? <><Play size={18} fill="currentColor" /> Lanjutkan Proses</> : <><Pause size={18} fill="currentColor" /> Hentikan Sementara</>}
                   </button>
+                  {task.stage === TaskStage.REVIEW && !task.reviewExtensionUsed && (
+                    <button
+                      onClick={() => onRequestExtension(task.id)}
+                      className="w-full py-5 border-2 border-purple-100 bg-purple-50 text-purple-600 rounded-[1.5rem] font-black uppercase text-[11px] tracking-[0.15em] transition-all flex items-center justify-center gap-3 hover:bg-purple-100 hover:border-purple-200 shadow-lg shadow-purple-50"
+                    >
+                      <Clock size={18} /> Ajukan Tambahan Waktu (+5 Hari)
+                    </button>
+                  )}
                 </div>
               )}
             </div>

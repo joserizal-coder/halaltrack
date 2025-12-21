@@ -30,6 +30,7 @@ export interface Task {
   assignedTo: string;
   whatsapp?: string;
   address?: string;
+  reviewExtensionUsed?: boolean;
   aiAnalysis?: string;
   checklist: Record<TaskStage, TaskChecklistItem[]>;
 }
