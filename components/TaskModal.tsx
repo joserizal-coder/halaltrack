@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, MessageSquare, AlertTriangle, Clock, Calendar, User, Sparkles, Loader2, CheckCircle, FileText, ChevronRight, Pause, Play, CheckSquare, Square } from 'lucide-react';
+import { X, MessageSquare, AlertTriangle, Clock, Calendar, User, Sparkles, Loader2, CheckCircle, FileText, ChevronRight, Pause, Play, CheckSquare, Square, Edit2, Save } from 'lucide-react';
 import { Task, TaskStage } from '../types';
 import { STAGES, getIcon, STAGE_SLA } from '../constants';
 import { analyzeTask } from '../services/geminiService';
@@ -9,23 +9,48 @@ interface TaskModalProps {
   canEdit: boolean;
   onClose: () => void;
   onUpdateStage: (taskId: string, newStage: TaskStage) => void;
+  onUpdateTask: (taskId: string, updates: Partial<Task>) => Promise<boolean>;
   onToggleHold: (taskId: string) => void;
   onToggleChecklist: (taskId: string, stage: TaskStage, itemId: string) => void;
 }
 
-const TaskModal: React.FC<TaskModalProps> = ({ task, canEdit, onClose, onUpdateStage, onToggleHold, onToggleChecklist }) => {
+const TaskModal: React.FC<TaskModalProps> = ({ task, canEdit, onClose, onUpdateStage, onUpdateTask, onToggleHold, onToggleChecklist }) => {
   const [aiInsight, setAiInsight] = useState<string | null>(null);
   const [loadingAi, setLoadingAi] = useState(false);
   const [showDocs, setShowDocs] = useState(false);
+
+  // Edit State
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: '',
+    company: '',
+    address: '',
+    whatsapp: '',
+    description: ''
+  });
 
   useEffect(() => {
     if (task) {
       setAiInsight(task.aiAnalysis || null);
       setShowDocs(false);
+      setEditForm({
+        name: task.name,
+        company: task.company,
+        address: task.address || '',
+        whatsapp: task.whatsapp || '',
+        description: task.description
+      });
+      setIsEditing(false);
     } else {
       setAiInsight(null);
     }
   }, [task]);
+
+  const handleSave = async () => {
+    if (!task) return;
+    const success = await onUpdateTask(task.id, editForm);
+    if (success) setIsEditing(false);
+  };
 
   if (!task) return null;
 
@@ -63,27 +88,68 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, canEdit, onClose, onUpdateS
                 </span>
                 <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">#{task.id.slice(0, 8)}</span>
               </div>
-              <h2 className="text-3xl font-black text-slate-900 leading-tight">{task.name}</h2>
-              <div className="flex flex-wrap items-center gap-4 mt-2">
-                <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">{task.company}</p>
-                {(task.whatsapp || task.address) && <div className="h-4 w-[1px] bg-slate-200"></div>}
-                {task.whatsapp && (
-                  <a
-                    href={`https://wa.me/${task.whatsapp.replace(/\D/g, '')}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 text-emerald-600 hover:text-emerald-700 font-black text-xs uppercase tracking-widest transition-colors"
-                  >
-                    <MessageSquare size={14} />
-                    Hubungi WA
-                  </a>
-                )}
-              </div>
+
+              {isEditing ? (
+                <div className="space-y-3 mb-2">
+                  <input
+                    value={editForm.name}
+                    onChange={e => setEditForm({ ...editForm, name: e.target.value })}
+                    className="text-2xl font-black text-slate-900 w-full bg-slate-50 border-b-2 border-emerald-500 focus:outline-none px-2 py-1"
+                    placeholder="Nama Produk"
+                  />
+                  <input
+                    value={editForm.company}
+                    onChange={e => setEditForm({ ...editForm, company: e.target.value })}
+                    className="text-sm font-bold text-slate-500 w-full bg-slate-50 border-b-2 border-slate-200 focus:border-emerald-500 focus:outline-none px-2 py-1"
+                    placeholder="Nama Perusahaan"
+                  />
+                </div>
+              ) : (
+                <>
+                  <h2 className="text-3xl font-black text-slate-900 leading-tight">{task.name}</h2>
+                  <div className="flex flex-wrap items-center gap-4 mt-2">
+                    <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">{task.company}</p>
+                    {(task.whatsapp || task.address) && <div className="h-4 w-[1px] bg-slate-200"></div>}
+                    {task.whatsapp && (
+                      <a
+                        href={`https://wa.me/${task.whatsapp.replace(/\D/g, '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 text-emerald-600 hover:text-emerald-700 font-black text-xs uppercase tracking-widest transition-colors"
+                      >
+                        <MessageSquare size={14} />
+                        Hubungi WA
+                      </a>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
           </div>
-          <button onClick={onClose} className="absolute top-8 right-8 p-3 text-slate-400 hover:text-slate-900 hover:bg-white rounded-2xl transition-all shadow-sm border border-transparent hover:border-slate-100 group">
-            <X size={24} className="group-hover:rotate-90 transition-transform duration-300" />
-          </button>
+          <div className="absolute top-8 right-8 flex gap-3">
+            {canEdit && (
+              <button
+                onClick={() => isEditing ? handleSave() : setIsEditing(true)}
+                className={`p-3 rounded-2xl transition-all shadow-sm group flex items-center gap-2 ${isEditing ? 'bg-emerald-500 text-white hover:bg-emerald-600' : 'text-slate-400 hover:text-slate-900 hover:bg-white border border-transparent hover:border-slate-100'}`}
+              >
+                {isEditing ? <Save size={20} /> : <Edit2 size={20} />}
+                {isEditing && <span className="font-bold text-xs pr-1">Simpan</span>}
+              </button>
+            )}
+            {isEditing && (
+              <button
+                onClick={() => setIsEditing(false)}
+                className="p-3 bg-white text-slate-400 hover:text-rose-500 rounded-2xl transition-all shadow-sm border border-slate-100 hover:border-rose-100"
+              >
+                <X size={20} />
+              </button>
+            )}
+            {!isEditing && (
+              <button onClick={onClose} className="p-3 text-slate-400 hover:text-slate-900 hover:bg-white rounded-2xl transition-all shadow-sm border border-transparent hover:border-slate-100 group">
+                <X size={24} className="group-hover:rotate-90 transition-transform duration-300" />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* content body */}
@@ -132,27 +198,54 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, canEdit, onClose, onUpdateS
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                   <div>
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">Alamat Perusahaan</p>
-                    <p className="text-sm font-bold text-slate-700 leading-relaxed bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                      {task.address || 'Alamat belum diatur'}
-                    </p>
+                    {isEditing ? (
+                      <textarea
+                        value={editForm.address}
+                        onChange={e => setEditForm({ ...editForm, address: e.target.value })}
+                        className="w-full h-24 p-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-emerald-500 focus:outline-none text-sm font-medium"
+                        placeholder="Alamat lengkap..."
+                      />
+                    ) : (
+                      <p className="text-sm font-bold text-slate-700 leading-relaxed bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                        {task.address || 'Alamat belum diatur'}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">Informasi Kontak</p>
-                    <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center justify-between">
-                      <span className="text-sm font-bold text-slate-700">{task.whatsapp || 'No. WA belum diatur'}</span>
-                      {task.whatsapp && (
-                        <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
-                          <MessageSquare size={16} />
-                        </div>
-                      )}
-                    </div>
+                    {isEditing ? (
+                      <input
+                        value={editForm.whatsapp}
+                        onChange={e => setEditForm({ ...editForm, whatsapp: e.target.value })}
+                        className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-emerald-500 focus:outline-none text-sm font-medium"
+                        placeholder="0812..."
+                      />
+                    ) : (
+                      <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center justify-between">
+                        <span className="text-sm font-bold text-slate-700">{task.whatsapp || 'No. WA belum diatur'}</span>
+                        {task.whatsapp && (
+                          <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                            <MessageSquare size={16} />
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div>
                   <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-3">Deskripsi Singkat</h4>
-                  <p className="text-slate-600 text-[15px] font-medium leading-relaxed">
-                    {task.description || 'Tidak ada deskripsi tambahan.'}
-                  </p>
+                  {isEditing ? (
+                    <textarea
+                      value={editForm.description}
+                      onChange={e => setEditForm({ ...editForm, description: e.target.value })}
+                      className="w-full h-32 p-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-emerald-500 focus:outline-none text-sm font-medium"
+                      placeholder="Deskripsi produk/usaha..."
+                    />
+                  ) : (
+                    <p className="text-slate-600 text-[15px] font-medium leading-relaxed">
+                      {task.description || 'Tidak ada deskripsi tambahan.'}
+                    </p>
+                  )}
                 </div>
               </div>
 

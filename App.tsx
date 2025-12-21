@@ -208,6 +208,38 @@ const App: React.FC = () => {
     setTasks(prev => prev.map(t => t.id === taskId ? { ...t, status: newStatus as any } : t));
   };
 
+  const handleUpdateTask = async (taskId: string, updates: Partial<Task>) => {
+    try {
+      const { error } = await supabase
+        .from('tasks')
+        .update({
+          name: updates.name,
+          company: updates.company,
+          description: updates.description,
+          whatsapp: updates.whatsapp,
+          address: updates.address,
+        })
+        .eq('id', taskId);
+
+      if (error) throw error;
+
+      setTasks(prev => prev.map(t =>
+        t.id === taskId ? { ...t, ...updates } : t
+      ));
+
+      // Update selected task if it's the one being edited
+      if (selectedTask?.id === taskId) {
+        setSelectedTask(prev => prev ? { ...prev, ...updates } : null);
+      }
+
+      return true;
+    } catch (err) {
+      console.error('Error updating task:', err);
+      alert('Gagal memperbarui data task.');
+      return false;
+    }
+  };
+
   const handleToggleChecklist = async (taskId: string, stage: TaskStage, itemId: string) => {
     const task = tasks.find(t => t.id === taskId);
     if (!task) return;
@@ -534,6 +566,7 @@ const App: React.FC = () => {
           canEdit={!!currentUser}
           onClose={() => setSelectedTask(null)}
           onUpdateStage={handleUpdateStage}
+          onUpdateTask={handleUpdateTask}
           onToggleHold={handleToggleHold}
           onToggleChecklist={handleToggleChecklist}
         />
