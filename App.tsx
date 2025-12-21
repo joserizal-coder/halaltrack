@@ -476,7 +476,7 @@ const App: React.FC = () => {
     >
       {activeView === 'dashboard' && (
         <>
-          <StatsDashboard tasks={tasks} />
+          <StatsDashboard tasks={tasks} overdueCount={overdueTasks.length} />
           <KanbanBoard
             tasks={filteredTasks}
             onMoveForward={(id) => handleUpdateStage(id, STAGES[STAGES.findIndex(s => s.id === tasks.find(t => t.id === id)?.stage) + 1]?.id as TaskStage)}

@@ -6,9 +6,10 @@ import { STAGES } from '../constants';
 
 interface StatsDashboardProps {
   tasks: Task[];
+  overdueCount: number;
 }
 
-const StatsDashboard: React.FC<StatsDashboardProps> = ({ tasks }) => {
+const StatsDashboard: React.FC<StatsDashboardProps> = ({ tasks, overdueCount }) => {
   const data = STAGES.map(stage => ({
     name: stage.label,
     count: tasks.filter(t => t.stage === stage.id).length,
@@ -17,7 +18,8 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({ tasks }) => {
 
   const totalTasks = tasks.length;
   const completed = tasks.filter(t => t.stage === TaskStage.CERTIFIED).length;
-  const completionRate = totalTasks > 0 ? Math.round((completed / totalTasks) * 100) : 0;
+  // const completionRate = totalTasks > 0 ? Math.round((completed / totalTasks) * 100) : 0;
+  const onTimeRate = totalTasks > 0 ? Math.round(((totalTasks - overdueCount) / totalTasks) * 100) : 100;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
@@ -93,23 +95,26 @@ const StatsDashboard: React.FC<StatsDashboardProps> = ({ tasks }) => {
           <div className="absolute top-[-20%] right-[-10%] w-48 h-48 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
 
           <div className="relative z-10">
-            <p className="text-emerald-100 text-[10px] font-black uppercase tracking-[0.2em] mb-4">Efisiensi Penyelesaian</p>
+            <p className="text-emerald-100 text-[10px] font-black uppercase tracking-[0.2em] mb-4">Ketepatan Waktu (SLA)</p>
             <div className="flex items-baseline gap-2 mb-8">
-              <h2 className="text-6xl font-black">{completed}</h2>
-              <span className="text-lg font-bold text-emerald-100/60 uppercase">Unit</span>
+              <h2 className="text-6xl font-black">{onTimeRate}</h2>
+              <span className="text-lg font-bold text-emerald-100/60 uppercase">%</span>
             </div>
 
             <div className="space-y-3">
               <div className="flex justify-between items-end">
-                <span className="text-[11px] font-black uppercase tracking-widest text-emerald-100">Progress</span>
-                <span className="text-xl font-black">{completionRate}%</span>
+                <span className="text-[11px] font-black uppercase tracking-widest text-emerald-100">Status Task</span>
+                <span className="text-xl font-black text-white">{totalTasks - overdueCount} <span className="text-xs text-emerald-200 font-bold">/ {totalTasks}</span></span>
               </div>
               <div className="w-full bg-white/20 h-3 rounded-full overflow-hidden backdrop-blur-sm">
                 <div
-                  className="bg-white h-full transition-all duration-1000 ease-out"
-                  style={{ width: `${completionRate}%` }}
+                  className={`h-full transition-all duration-1000 ease-out ${onTimeRate > 80 ? 'bg-white' : onTimeRate > 50 ? 'bg-indigo-300' : 'bg-rose-400'}`}
+                  style={{ width: `${onTimeRate}%` }}
                 ></div>
               </div>
+              <p className="text-[10px] text-emerald-100 font-medium pt-2">
+                {overdueCount > 0 ? `${overdueCount} task melebihi batas waktu` : 'Semua task sesuai target waktu'}
+              </p>
             </div>
           </div>
         </div>
