@@ -316,13 +316,18 @@ const App: React.FC = () => {
 
 
 
-      const { error: profileError } = await supabase
+      const { error: profileError, count } = await supabase
         .from('profiles')
-        .delete()
+        .delete({ count: 'exact' })
         .eq('id', userId);
 
       if (profileError) {
         alert(`Gagal menghapus user: ${profileError.message}`);
+        return;
+      }
+
+      if (count === 0) {
+        alert('Gagal menghapus user. Kemungkinan akun Anda tidak memiliki izin untuk menghapus user ini.');
         return;
       }
 
