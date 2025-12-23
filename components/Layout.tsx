@@ -151,7 +151,7 @@ const Layout: React.FC<LayoutProps> = ({
               © 2026 LPH UNISMA
             </p>
             <a
-              href="https://www.lph.unisma.ac.id"
+              href="https://lph.unisma.ac.id"
               target="_blank"
               rel="noopener noreferrer"
               className="text-[9px] text-emerald-600 hover:text-emerald-700 font-semibold transition-colors"
@@ -247,7 +247,7 @@ const Layout: React.FC<LayoutProps> = ({
               © 2026 LPH UNISMA
             </p>
             <a
-              href="https://www.lph.unisma.ac.id"
+              href="https://lph.unisma.ac.id"
               target="_blank"
               rel="noopener noreferrer"
               className="text-[9px] text-emerald-600 hover:text-emerald-700 font-semibold transition-colors"
