@@ -106,10 +106,7 @@ const SettingsDashboard: React.FC<SettingsDashboardProps> = ({ slaSettings, onSa
                   Database Connected
                 </span>
               </div>
-              <div className="flex items-center justify-between py-2">
-                <span className="text-sm text-slate-500 font-medium">AI Engine</span>
-                <span className="text-sm font-bold text-indigo-600">Gemini 3 Flash</span>
-              </div>
+
             </div>
           </div>
 
